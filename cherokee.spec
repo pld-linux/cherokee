@@ -11,6 +11,7 @@ Source0:	ftp://alobbs.com/cherokee/%{version}/%{name}-%{version}-%{pre}.tar.gz
 # Source0-md5:	c3987a0abe0cbbab54d939a2fcc046ba
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 BuildRequires:	fcgi-devel
+BuildRequires:	gnome-vfs2-devel
 
 %description
 - FAST and tiny
@@ -18,6 +19,7 @@ BuildRequires:	fcgi-devel
 - Extensible with plug-ins
 - Handler-to-path support
 - Virtual servers support
+- FastCGI support
 - Encoders support: o GZip
 - Loggers support: o NCSA
 - Dynamic / Static plug-in compilation
