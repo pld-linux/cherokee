@@ -2,7 +2,7 @@ Summary:	Cherokee webserver
 Summary(pl):	Cherokee - serwer WWW
 Name:		cherokee
 Version:	0.4.6
-%define pre	20031225
+%define		pre	20031225
 Release:	0.%{pre}.1
 License:	GPL
 Group:		Networking/Daemons
@@ -16,6 +16,7 @@ BuildRequires:	gnome-vfs2-devel >= 2.0
 BuildRequires:	pam-devel
 BuildRequires:	pkgconfig
 BuildRequires:	zlib-devel
+Provides:	webserver
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
