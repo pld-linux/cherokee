@@ -10,7 +10,12 @@ Source0:	ftp://alobbs.com/cherokee/%{version}/%{name}-%{version}-%{pre}.tar.gz
 # Source0-md5:	c3987a0abe0cbbab54d939a2fcc046ba
 URL:		http://alobbs.com/cherokee/
 BuildRequires:	fcgi-devel
-BuildRequires:	gnome-vfs2-devel
+BuildRequires:	gnome-vfs2-devel >= 2.0
+# "TLS under construction"
+#BuildRequires:	gnutls-devel >= 0.9.99
+BuildRequires:	pam-devel
+BuildRequires:	pkgconfig
+BuildRequires:	zlib-devel
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
@@ -52,6 +57,7 @@ Cherokee to serwer WWW:
 Summary:	Header files for Cherokee web server
 Summary(pl):	Pliki nag³ówkowe dla serwera WWW Cherokee
 Group:		Development/Libraries
+Requires:	%{name} = %{version}
 
 %description devel
 Header files for Cherokee web server.
@@ -64,6 +70,7 @@ Pliki nag³ówkowe dla serwera WWW Cherokee.
 
 %build
 %configure \
+	--disable-static \
 	--enable-gnomevfs \
 	--enable-tls
 %{__make}
@@ -74,23 +81,32 @@ rm -rf $RPM_BUILD_ROOT
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT
 
+# modules dlopened by *.so
+rm -f $RPM_BUILD_ROOT%{_libdir}/cherokee/lib*.la
+
 %clean
 rm -rf $RPM_BUILD_ROOT
+
+%post	-p /sbin/ldconfig
+%postun	-p /sbin/ldconfig
 
 %files
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_bindir}/cherokee
 %dir %{_sysconfdir}/cherokee
 %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/cherokee/cherokee.conf
+%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/cherokee/icons.conf
+%attr(755,root,root) %{_libdir}/libcherokee.so.*.*.*
 %dir %{_libdir}/cherokee
-%{_libdir}/cherokee/libcherokee_*
-%{_libdir}/libcherokee.*
+%attr(755,root,root) %{_libdir}/cherokee/libcherokee_*.so*
 %{_datadir}/cherokee
 %{_mandir}/man1/cherokee.1*
 
 %files devel
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_bindir}/cherokee-config
+%attr(755,root,root) %{_libdir}/libcherokee.so
+%{_libdir}/libcherokee.la
 %{_includedir}/cherokee
 %{_pkgconfigdir}/cherokee.pc
 %{_aclocaldir}/cherokee.m4
