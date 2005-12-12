@@ -95,8 +95,8 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_bindir}/cherokee
 %dir %{_sysconfdir}/cherokee
-%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/cherokee/cherokee.conf
-%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/cherokee/icons.conf
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/cherokee/cherokee.conf
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/cherokee/icons.conf
 %attr(755,root,root) %{_libdir}/libcherokee.so.*.*.*
 %dir %{_libdir}/cherokee
 %attr(755,root,root) %{_libdir}/cherokee/libcherokee_*.so*
