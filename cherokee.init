@@ -69,21 +69,21 @@ case "$1" in
 		msg_not_running "Cherokee Web Server"
 	fi
 	;;
-  restart)
+  restart|reload)
 	$0 stop
 	$0 start
 	exit $?
 	;;
-  reload)
-	if [ -f /var/lock/subsys/cherokee ]; then
-		msg_reloading "Cherokee Web Server"
-		start-stop-daemon --stop --pidfile /var/run/cherokee.pid --signal HUP
-		RETVAL=$?
-	else
-		msg_not_running "Cherokee Web Server" >&2
-		RETVAL=7
-	fi
-	;;
+#  reload)
+#	if [ -f /var/lock/subsys/cherokee ]; then
+#		msg_reloading "Cherokee Web Server"
+#		start-stop-daemon --stop --pidfile /var/run/cherokee.pid --signal HUP && ok || fail
+#		RETVAL=$?
+#	else
+#		msg_not_running "Cherokee Web Server" >&2
+#		RETVAL=7
+#	fi
+#	;;
   force-reload)
 	$0 reload
 	exit $?
