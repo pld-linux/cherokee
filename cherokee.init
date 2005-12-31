@@ -33,9 +33,17 @@ case "$1" in
 	# Check if the service is already running?
 	if [ ! -f /var/lock/subsys/cherokee ]; then
 		msg_starting "Cherokee Web Server"
-		start-stop-daemon --start --exec /usr/sbin/cherokee --background --pidfile /var/run/cherokee.pid
+		(
+		# it offers no stdout/stderr logging. workaround
+		exec 2>>/var/log/cherokee/cherokee.log
+		exec 1>&2
+		start-stop-daemon --start --exec /usr/sbin/cherokee --pidfile /var/run/cherokee.pid -- -b
+		)
 		RETVAL=$?
 		if [ $RETVAL -eq 0 ]; then
+			# the pidfile written is wrong when cherokee -b is used. damn
+			pid=$(/sbin/pidof cherokee)
+			echo $pid > /var/run/cherokee.pid
 			touch /var/lock/subsys/cherokee
 			ok
 		else
