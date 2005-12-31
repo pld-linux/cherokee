@@ -11,7 +11,7 @@ Summary:	Fast, Flexible and Lightweight Web server
 Summary(pl):	Cherokee - serwer WWW
 Name:		cherokee
 Version:	0.4.29
-Release:	0.7
+Release:	0.12
 License:	GPL v2
 Group:		Networking/Daemons
 Source0:	http://www.0x50.org/download/0.4/0.4.29/%{name}-%{version}.tar.gz
@@ -113,7 +113,7 @@ Pliki nag³ówkowe dla serwera WWW Cherokee.
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT/etc/{sysconfig,rc.d/init.d}
+install -d $RPM_BUILD_ROOT{/etc/{sysconfig,rc.d/init.d},/var/log/%{name}}
 
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT
@@ -144,7 +144,7 @@ rm -rf $RPM_BUILD_ROOT
 %post
 /sbin/ldconfig
 /sbin/chkconfig --add %{name}
-%service %{name} restart "Cherokee webserver"
+%service %{name} restart "Cherokee webserver" || :
 
 %preun
 if [ "$1" = "0" ]; then
@@ -163,21 +163,21 @@ fi
 %files
 %defattr(644,root,root,755)
 %doc AUTHORS ChangeLog TODO html
-%dir %{_sysconfdir}
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/cherokee.conf
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/icons.conf
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/advanced.conf
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/mime.conf
-%dir %{_sysconfdir}/mods-available
-%dir %{_sysconfdir}/mods-enabled
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/mods-available/admin
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/mods-available/ssl
-%dir %{_sysconfdir}/sites-available
-%dir %{_sysconfdir}/sites-enabled
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/sites-available/default
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/sites-available/example.com
+%dir %attr(750,root,root) %{_sysconfdir}
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/cherokee.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/icons.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/advanced.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/mime.conf
+%dir %attr(750,root,root) %{_sysconfdir}/mods-available
+%dir %attr(750,root,root) %{_sysconfdir}/mods-enabled
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/mods-available/admin
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/mods-available/ssl
+%dir %attr(750,root,root) %{_sysconfdir}/sites-available
+%dir %attr(750,root,root) %{_sysconfdir}/sites-enabled
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/sites-available/default
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/sites-available/example.com
 %config(missingok) %{_sysconfdir}/sites-enabled/default
-%attr(750,root,root) %dir %{_sysconfdir}/ssl
+%dir %attr(750,root,root) %{_sysconfdir}/ssl
 
 %config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/cherokee
 %attr(754,root,root) /etc/rc.d/init.d/cherokee
@@ -220,7 +220,10 @@ fi
 %{_datadir}/cherokee
 
 %dir %{_wwwhome}
-%{_wwwroot}
+%dir %{_wwwroot}
+%config(missingok) %{_wwwroot}/*
+
+%dir %attr(750,root,logs) /var/log/%{name}
 
 %files devel
 %defattr(644,root,root,755)
