@@ -1,0 +1,92 @@
+#!/bin/sh
+#
+# cherokee	Start the cherokee HTTP server.
+#
+# chkconfig:	345 20 80
+#
+# description:	Cherokee is Fast, Flexible and Lightweight Web server
+#
+# $Id$
+
+# Source function library
+. /etc/rc.d/init.d/functions
+
+# Get network config
+. /etc/sysconfig/network
+
+# Get service config - may override defaults
+[ -f /etc/sysconfig/cherokee ] && . /etc/sysconfig/cherokee
+
+# Check that networking is up.
+if is_yes "${NETWORKING}"; then
+	if [ ! -f /var/lock/subsys/network ]; then
+		msg_network_down cherokee
+		exit 1
+	fi
+else
+	exit 0
+fi
+
+# See how we were called.
+case "$1" in
+  start)
+	# Check if the service is already running?
+	if [ ! -f /var/lock/subsys/cherokee ]; then
+		msg_starting cherokee
+#		daemon cherokee
+		start-stop-daemon --start --pidfile $PIDFILE -b --exec /usr/sbin/cherokee && ok || fail
+		RETVAL=$?
+		[ $RETVAL -eq 0 ] && touch /var/lock/subsys/cherokee
+	else
+		msg_already_running cherokee
+	fi
+	;;
+  stop)
+	if [ -f /var/lock/subsys/cherokee ]; then
+		# Stop daemons.
+		msg_stopping cherokee
+#		killproc cherokee
+		start-stop-daemon --stop --pidfile /var/run/cherokee.pid --oknodo --exec cherokee && ok || fail
+		rm -f /var/lock/subsys/cherokee
+	else
+		msg_not_running cherokee
+	fi
+	;;
+  restart)
+	$0 stop
+	$0 start
+	exit $?
+	;;
+  reload)
+	if [ -f /var/lock/subsys/cherokee ]; then
+		msg_reloading cherokee
+#		killproc --pidfile cherokee.pid cherokee -USR1
+		start-stop-daemon --stop --pidfile /var/run/cherokee.pid --signal USR1 --exec cherokee
+		RETVAL=$?
+	else
+		msg_not_running cherokee >&2
+		RETVAL=7
+	fi
+	;;
+  reload-modules)
+	nls "Reloading %s modules" cherokee
+	start-stop-daemon --stop --pidfile /var/run/cherokee.pid --oknodo --retry 30
+	start-stop-daemon --start --pidfile /var/run/cherokee.pid --exec cherokee
+	;;
+  force-reload)
+	$0 reload
+	exit $?
+	;;
+  status)
+	status cherokee
+	RETVAL=$?
+	;;
+  *)
+	msg_usage "$0 {start|stop|restart|reload|force-reload|status}"
+	exit 3
+esac
+
+exit $RETVAL
+
+# This must be last line !
+# vi:syntax=sh

@@ -1,0 +1,4 @@
+# Customized settings for Cherokee webserver
+
+# Define nice level for Cherokee
+#SERVICE_RUN_NICE_LEVEL="+0"
