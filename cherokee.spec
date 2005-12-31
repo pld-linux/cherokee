@@ -11,7 +11,7 @@ Summary:	Fast, Flexible and Lightweight Web server
 Summary(pl):	Cherokee - serwer WWW
 Name:		cherokee
 Version:	0.4.29
-Release:	0.13
+Release:	0.15
 License:	GPL v2
 Group:		Networking/Daemons
 Source0:	http://www.0x50.org/download/0.4/0.4.29/%{name}-%{version}.tar.gz
@@ -144,7 +144,8 @@ rm -rf $RPM_BUILD_ROOT
 %post
 /sbin/ldconfig
 /sbin/chkconfig --add %{name}
-%service %{name} restart "Cherokee webserver" || :
+%service %{name} restart "Cherokee webserver"
+exit 0
 
 %preun
 if [ "$1" = "0" ]; then
@@ -155,8 +156,8 @@ fi
 %postun
 /sbin/ldconfig
 if [ "$1" = "0" ]; then
-	%userremove lighttpd
-	%groupremove lighttpd
+	%userremove cherokee
+	%groupremove cherokee
 	%groupremove http
 fi
 
