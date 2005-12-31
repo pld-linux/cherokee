@@ -11,7 +11,7 @@ Summary:	Fast, Flexible and Lightweight Web server
 Summary(pl):	Cherokee - serwer WWW
 Name:		cherokee
 Version:	0.4.29
-Release:	0.12
+Release:	0.13
 License:	GPL v2
 Group:		Networking/Daemons
 Source0:	http://www.0x50.org/download/0.4/0.4.29/%{name}-%{version}.tar.gz
@@ -113,7 +113,7 @@ Pliki nag³ówkowe dla serwera WWW Cherokee.
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT{/etc/{sysconfig,rc.d/init.d},/var/log/%{name}}
+install -d $RPM_BUILD_ROOT{/etc/{pam.d,sysconfig,rc.d/init.d},/var/log/%{name}}
 
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT
@@ -179,6 +179,7 @@ fi
 %config(missingok) %{_sysconfdir}/sites-enabled/default
 %dir %attr(750,root,root) %{_sysconfdir}/ssl
 
+%config(noreplace) %verify(not md5 mtime size) /etc/pam.d/cherokee
 %config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/cherokee
 %attr(754,root,root) /etc/rc.d/init.d/cherokee
 
