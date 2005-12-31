@@ -20,7 +20,7 @@
 # Check that networking is up.
 if is_yes "${NETWORKING}"; then
 	if [ ! -f /var/lock/subsys/network ]; then
-		msg_network_down cherokee
+		msg_network_down "Cherokee Web Server"
 		exit 1
 	fi
 else
@@ -32,24 +32,33 @@ case "$1" in
   start)
 	# Check if the service is already running?
 	if [ ! -f /var/lock/subsys/cherokee ]; then
-		msg_starting cherokee
-#		daemon cherokee
-		start-stop-daemon --start --pidfile $PIDFILE -b --exec /usr/sbin/cherokee && ok || fail
+		msg_starting "Cherokee Web Server"
+		start-stop-daemon --start --exec /usr/sbin/cherokee --background --pidfile /var/run/cherokee.pid
 		RETVAL=$?
-		[ $RETVAL -eq 0 ] && touch /var/lock/subsys/cherokee
+		if [ $RETVAL -eq 0 ]; then
+			touch /var/lock/subsys/cherokee
+			ok
+		else
+			fail
+		fi
 	else
-		msg_already_running cherokee
+		msg_already_running "Cherokee Web Server"
 	fi
 	;;
   stop)
 	if [ -f /var/lock/subsys/cherokee ]; then
 		# Stop daemons.
-		msg_stopping cherokee
-#		killproc cherokee
-		start-stop-daemon --stop --pidfile /var/run/cherokee.pid --oknodo --exec cherokee && ok || fail
-		rm -f /var/lock/subsys/cherokee
+		msg_stopping "Cherokee Web Server"
+		start-stop-daemon --stop --pidfile /var/run/cherokee.pid --oknodo --exec /usr/sbin/cherokee
+		RETVAL=$?
+		if [ $RETVAL -eq 0 ]; then
+			rm -f /var/run/cherokee.pid /var/lock/subsys/cherokee >/dev/null 2>&1
+			ok
+		else
+			fail
+		fi
 	else
-		msg_not_running cherokee
+		msg_not_running "Cherokee Web Server"
 	fi
 	;;
   restart)
@@ -59,19 +68,13 @@ case "$1" in
 	;;
   reload)
 	if [ -f /var/lock/subsys/cherokee ]; then
-		msg_reloading cherokee
-#		killproc --pidfile cherokee.pid cherokee -USR1
-		start-stop-daemon --stop --pidfile /var/run/cherokee.pid --signal USR1 --exec cherokee
+		msg_reloading "Cherokee Web Server"
+		start-stop-daemon --stop --pidfile /var/run/cherokee.pid --signal HUP
 		RETVAL=$?
 	else
-		msg_not_running cherokee >&2
+		msg_not_running "Cherokee Web Server" >&2
 		RETVAL=7
 	fi
-	;;
-  reload-modules)
-	nls "Reloading %s modules" cherokee
-	start-stop-daemon --stop --pidfile /var/run/cherokee.pid --oknodo --retry 30
-	start-stop-daemon --start --pidfile /var/run/cherokee.pid --exec cherokee
 	;;
   force-reload)
 	$0 reload
