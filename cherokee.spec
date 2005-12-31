@@ -1,4 +1,4 @@
-%bcond_with	php		# adds PHP support
+%bcond_without	php		# adds PHP support
 %bcond_with	mono	# adds ASPX support
 %bcond_with	gnomevfs	# compile the gnomevfs handler (broken)
 %bcond_without	gnutls	# build with tls=gnutls
@@ -11,14 +11,18 @@ Summary:	Fast, Flexible and Lightweight Web server
 Summary(pl):	Cherokee - serwer WWW
 Name:		cherokee
 Version:	0.4.29
-Release:	0.4
+Release:	0.7
 License:	GPL v2
 Group:		Networking/Daemons
 Source0:	http://www.0x50.org/download/0.4/0.4.29/%{name}-%{version}.tar.gz
 # Source0-md5:	854e6e61a69781746496012658d8ef98
 Source1:	%{name}.init
 Source2:	%{name}.sysconfig
+Patch0:		%{name}-config.patch
+Patch1:		%{name}-php-path.patch
 URL:		http://www.0x50.org/
+BuildRequires:	autoconf
+BuildRequires:	automake
 BuildRequires:	fcgi-devel
 %{?with_gnomevfs:BuildRequires:	gnome-vfs2-devel >= 2.0}
 %{?with_gnutls:BuildRequires:	gnutls-devel >= 0.9.99}
@@ -26,8 +30,19 @@ BuildRequires:	fcgi-devel
 BuildRequires:	pam-devel
 BuildRequires:	pcre-devel
 BuildRequires:	pkgconfig
+BuildRequires:	rpmbuild(macros) >= 1.268
 BuildRequires:	zlib-devel
-Requires(post):	/sbin/ldconfig
+Requires(post,postun):	/sbin/ldconfig
+Requires(post,preun):	rc-scripts
+Requires(postun):	/usr/sbin/groupdel
+Requires(postun):	/usr/sbin/userdel
+Requires(pre):	/bin/id
+Requires(pre):	/usr/bin/getgid
+Requires(pre):	/usr/sbin/groupadd
+Requires(pre):	/usr/sbin/useradd
+Provides:	group(cherokee)
+Provides:	group(http)
+Provides:	user(cherokee)
 Provides:	webserver
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -75,16 +90,23 @@ Pliki nag³ówkowe dla serwera WWW Cherokee.
 
 %prep
 %setup -q
+%patch0 -p1
+%patch1 -p1
 
 %build
+%{__aclocal} -I m4
+%{__autoconf}
+%{__autoheader}
+%{__automake}
 %configure \
 	--sysconfdir=/etc \
+	--enable-os-string="PLD Linux" \
 	--with-wwwroot=%{_wwwroot} \
 	--disable-static \
 	%{?with_gnomevfs:--enable-gnomevfs} \
 	%{?with_tls:--enable-tls=%{?with_gnutls:gnutls}%{?with_openssl:openssl}} \
 	--enable-pthreads \
-	%{?with_php:--with-php=DIR} \
+	%{?with_php:--with-php=%{_prefix}} \
 	%{?with_mono:--with-mono=DIR}
 
 %{__make}
@@ -99,6 +121,10 @@ install -d $RPM_BUILD_ROOT/etc/{sysconfig,rc.d/init.d}
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/%{name}
 install %{SOURCE2} $RPM_BUILD_ROOT/etc/sysconfig/%{name}
 
+# users don't need this
+mv $RPM_BUILD_ROOT{%{_bindir},%{_sbindir}}/cherokee-panic
+mv $RPM_BUILD_ROOT{%{_bindir},%{_sbindir}}/cherokee_logrotate
+
 # modules dlopened by *.so
 rm -f $RPM_BUILD_ROOT%{_libdir}/cherokee/lib*.la
 
@@ -108,6 +134,12 @@ mv $RPM_BUILD_ROOT%{_docdir}/%{name} html
 
 %clean
 rm -rf $RPM_BUILD_ROOT
+
+%pre
+%groupadd -g 161 cherokee
+%groupadd -g 51 http
+%useradd -u 161 -d %{_wwwhome} -c "Cherokee User" -g cherokee cherokee
+%addusertogroup cherokee http
 
 %post
 /sbin/ldconfig
@@ -120,7 +152,13 @@ if [ "$1" = "0" ]; then
 	/sbin/chkconfig --del %{name}
 fi
 
-%postun	-p /sbin/ldconfig
+%postun
+/sbin/ldconfig
+if [ "$1" = "0" ]; then
+	%userremove lighttpd
+	%groupremove lighttpd
+	%groupremove http
+fi
 
 %files
 %defattr(644,root,root,755)
@@ -138,17 +176,19 @@ fi
 %dir %{_sysconfdir}/sites-enabled
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/sites-available/default
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/sites-available/example.com
+%config(missingok) %{_sysconfdir}/sites-enabled/default
 %attr(750,root,root) %dir %{_sysconfdir}/ssl
 
 %config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/cherokee
 %attr(754,root,root) /etc/rc.d/init.d/cherokee
 
 %attr(755,root,root) %{_bindir}/cget
-%attr(755,root,root) %{_bindir}/cherokee-panic
-%attr(755,root,root) %{_bindir}/cherokee_logrotate
 %attr(755,root,root) %{_sbindir}/cherokee
+%attr(755,root,root) %{_sbindir}/cherokee-panic
+%attr(755,root,root) %{_sbindir}/cherokee_logrotate
 
 %dir %{_libdir}/cherokee
+%attr(755,root,root) %{_libdir}/cherokee/libplugin_admin.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_cgi.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_combined.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_common.so
