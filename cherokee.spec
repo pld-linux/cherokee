@@ -1,8 +1,10 @@
+#
+# Conditional build:
 %bcond_without	php		# adds PHP support
-%bcond_with	mono	# adds ASPX support
+%bcond_with	mono		# adds ASPX support
 %bcond_with	gnomevfs	# compile the gnomevfs handler (broken)
-%bcond_without	gnutls	# build with tls=gnutls
-%bcond_with	openssl	# build with tls=openssl
+%bcond_without	gnutls		# build with tls=gnutls
+%bcond_with	openssl		# build with tls=openssl
 #
 %if %{with gnutls} || %{with openssl}
 %define	with_tls 1
@@ -80,7 +82,7 @@ Cherokee to serwer WWW:
 Summary:	Header files for Cherokee web server
 Summary(pl):	Pliki nag³ówkowe dla serwera WWW Cherokee
 Group:		Development/Libraries
-Requires:	%{name} = %{version}
+Requires:	%{name} = %{version}-%{release}
 
 %description devel
 Header files for Cherokee web server.
