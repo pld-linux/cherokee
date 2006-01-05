@@ -69,7 +69,7 @@ case "$1" in
 		msg_not_running "Cherokee Web Server"
 	fi
 	;;
-  restart)
+  restart|force-reload)
 	$0 stop
 	$0 start
 	exit $?
