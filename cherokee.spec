@@ -55,28 +55,19 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %description
 Cherokee is a flexible, very fast, lightweight Web server. It is
 implemented entirely in C, and has no dependencies beyond a standard C
-library. It is embeddable and extensible wi th plug-ins. It supports
+library. It is embeddable and extensible with plug-ins. It supports
 on-the-fly configuration by reading files or strings, TLS/SSL (via
 GNUTLS or OpenSSL), virtual hosts, authentication, cache friendly
 features, PHP, custom error management, and much more.
 
 %description -l pl
-Cherokee to serwer WWW:
-- SZYBKI i ma³y
-- mo¿liwy do wbudowania
-- rozszerzalny przy pomocy wtyczek
-- z mo¿liwo¶ci± przypisania sposobu obs³ugi do ¶cie¿ek
-- z obs³ug± serwerów wirtualnych
-- z obs³ug± FastCGI
-- z obs³ug± kodowania, w tym GZipa
-- z obs³ug± loggerów, w tym NCSA
-- z dynamiczn± lub statyczn± kompilacj± wtyczek
-- z obs³ug± strumieni
-- wykonuj±cy popularne zadania: praca jako demon, obs³uga typów MIME,
-  logowanie poprzez sysloga, po³±czenia keep-alive, dzia³anie w
-  ¶rodowisku chrootowanym
-- o przejrzystym kodzie ;-)
-- bêd±cy oprogramowaniem wolnodostêpnym.
+Cherokee to elastyczny, bardzo szybki i lekki serwer WWW. Jest
+zaimplementowany ca³kowicie w C i nie ma zale¿no¶ci poza standardow±
+bibliotek± C. Jest osadzalny i rozbudowywalny poprzez wtyczki.
+Obs³uguje konfiguracjê w locie poprzez odczyt plików lub ³añcuchów
+znaków, TLS/SSL (poprzez GNUTLS lub OpenSSL), hosty wirtualne,
+uwierzytelnianie, opcje zwi±zane z pamiêci± podrêczn±, PHP, w³asne
+zarz±dzanie b³êdami i wiele wiêcej.
 
 %package devel
 Summary:	Header files for Cherokee web server
