@@ -74,20 +74,12 @@ case "$1" in
 	$0 start
 	exit $?
 	;;
-  reload)
-  	# not implemented
-  	RETVAL=3
-	;;
-  force-reload)
-	$0 reload
-	exit $?
-	;;
   status)
 	status cherokee
 	RETVAL=$?
 	;;
   *)
-	msg_usage "$0 {start|stop|restart|reload|force-reload|status}"
+	msg_usage "$0 {start|stop|restart|status}"
 	exit 3
 esac
 
