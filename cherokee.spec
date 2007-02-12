@@ -10,7 +10,7 @@
 %define	with_tls 1
 %endif
 Summary:	Fast, Flexible and Lightweight Web server
-Summary(pl.UTF-8):   Cherokee - serwer WWW
+Summary(pl.UTF-8):	Cherokee - serwer WWW
 Name:		cherokee
 Version:	0.4.29
 Release:	0.15
@@ -71,7 +71,7 @@ zarządzanie błędami i wiele więcej.
 
 %package devel
 Summary:	Header files for Cherokee web server
-Summary(pl.UTF-8):   Pliki nagłówkowe dla serwera WWW Cherokee
+Summary(pl.UTF-8):	Pliki nagłówkowe dla serwera WWW Cherokee
 Group:		Development/Libraries
 Requires:	%{name} = %{version}-%{release}
 
