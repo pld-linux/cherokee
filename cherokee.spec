@@ -10,7 +10,7 @@
 %define	with_tls 1
 %endif
 Summary:	Fast, Flexible and Lightweight Web server
-Summary(pl):	Cherokee - serwer WWW
+Summary(pl.UTF-8):   Cherokee - serwer WWW
 Name:		cherokee
 Version:	0.4.29
 Release:	0.15
@@ -60,26 +60,26 @@ on-the-fly configuration by reading files or strings, TLS/SSL (via
 GNUTLS or OpenSSL), virtual hosts, authentication, cache friendly
 features, PHP, custom error management, and much more.
 
-%description -l pl
+%description -l pl.UTF-8
 Cherokee to elastyczny, bardzo szybki i lekki serwer WWW. Jest
-zaimplementowany ca³kowicie w C i nie ma zale¿no¶ci poza standardow±
-bibliotek± C. Jest osadzalny i rozbudowywalny poprzez wtyczki.
-Obs³uguje konfiguracjê w locie poprzez odczyt plików lub ³añcuchów
-znaków, TLS/SSL (poprzez GNUTLS lub OpenSSL), hosty wirtualne,
-uwierzytelnianie, opcje zwi±zane z pamiêci± podrêczn±, PHP, w³asne
-zarz±dzanie b³êdami i wiele wiêcej.
+zaimplementowany caÅ‚kowicie w C i nie ma zaleÅ¼noÅ›ci poza standardowÄ…
+bibliotekÄ… C. Jest osadzalny i rozbudowywalny poprzez wtyczki.
+ObsÅ‚uguje konfiguracjÄ™ w locie poprzez odczyt plikÃ³w lub Å‚aÅ„cuchÃ³w
+znakÃ³w, TLS/SSL (poprzez GNUTLS lub OpenSSL), hosty wirtualne,
+uwierzytelnianie, opcje zwiÄ…zane z pamiÄ™ciÄ… podrÄ™cznÄ…, PHP, wÅ‚asne
+zarzÄ…dzanie bÅ‚Ä™dami i wiele wiÄ™cej.
 
 %package devel
 Summary:	Header files for Cherokee web server
-Summary(pl):	Pliki nag³ówkowe dla serwera WWW Cherokee
+Summary(pl.UTF-8):   Pliki nagÅ‚Ã³wkowe dla serwera WWW Cherokee
 Group:		Development/Libraries
 Requires:	%{name} = %{version}-%{release}
 
 %description devel
 Header files for Cherokee web server.
 
-%description devel -l pl
-Pliki nag³ówkowe dla serwera WWW Cherokee.
+%description devel -l pl.UTF-8
+Pliki nagÅ‚Ã³wkowe dla serwera WWW Cherokee.
 
 %prep
 %setup -q
