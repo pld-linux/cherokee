@@ -2,7 +2,6 @@
 # Conditional build:
 %bcond_without	php		# adds PHP support
 %bcond_with	mono		# adds ASPX support
-%bcond_with	gnomevfs	# compile the gnomevfs handler (broken)
 %bcond_without	gnutls		# build with tls=gnutls
 %bcond_with	openssl		# build with tls=openssl
 #
@@ -12,12 +11,12 @@
 Summary:	Fast, Flexible and Lightweight Web server
 Summary(pl.UTF-8):	Cherokee - serwer WWW
 Name:		cherokee
-Version:	0.4.29
-Release:	0.15
+Version:	0.6.1
+Release:	0.1
 License:	GPL v2
 Group:		Networking/Daemons
-Source0:	http://www.0x50.org/download/0.4/0.4.29/%{name}-%{version}.tar.gz
-# Source0-md5:	854e6e61a69781746496012658d8ef98
+Source0:	http://www.cherokee-project.com/download/0.6/0.6.1/%{name}-%{version}.tar.gz
+# Source0-md5:	49044d6c9c50a6726a4e6c3c7f8ea544
 Source1:	%{name}.init
 Source2:	%{name}.sysconfig
 Patch0:		%{name}-config.patch
@@ -26,12 +25,14 @@ URL:		http://www.0x50.org/
 BuildRequires:	autoconf
 BuildRequires:	automake
 BuildRequires:	fcgi-devel
-%{?with_gnomevfs:BuildRequires:	gnome-vfs2-devel >= 2.0}
 %{?with_gnutls:BuildRequires:	gnutls-devel >= 0.9.99}
+BuildRequires:	mysql-devel
+BuildRequires:	openldap-devel
 %{?with_openssl:BuildRequires:	openssl-devel}
 BuildRequires:	pam-devel
 BuildRequires:	pcre-devel
 BuildRequires:	pkgconfig
+BuildRequires:	python-docutils
 BuildRequires:	rpmbuild(macros) >= 1.268
 BuildRequires:	zlib-devel
 Requires(post,postun):	/sbin/ldconfig
@@ -96,7 +97,6 @@ Pliki nagłówkowe dla serwera WWW Cherokee.
 	--enable-os-string="PLD Linux" \
 	--with-wwwroot=%{_wwwroot} \
 	--disable-static \
-	%{?with_gnomevfs:--enable-gnomevfs} \
 	%{?with_tls:--enable-tls=%{?with_gnutls:gnutls}%{?with_openssl:openssl}} \
 	--enable-pthreads \
 	%{?with_php:--with-php=%{_prefix}} \
@@ -116,7 +116,7 @@ install %{SOURCE2} $RPM_BUILD_ROOT/etc/sysconfig/%{name}
 
 # users don't need this
 mv $RPM_BUILD_ROOT{%{_bindir},%{_sbindir}}/cherokee-panic
-mv $RPM_BUILD_ROOT{%{_bindir},%{_sbindir}}/cherokee_logrotate
+#mv $RPM_BUILD_ROOT{%{_bindir},%{_sbindir}}/cherokee_logrotate
 
 # modules dlopened by *.so
 rm -f $RPM_BUILD_ROOT%{_libdir}/cherokee/lib*.la
@@ -159,18 +159,12 @@ fi
 %doc AUTHORS ChangeLog TODO html
 %dir %attr(750,root,root) %{_sysconfdir}
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/cherokee.conf
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/icons.conf
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/advanced.conf
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/mime.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/mime.compression.types
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/mime.types
 %dir %attr(750,root,root) %{_sysconfdir}/mods-available
 %dir %attr(750,root,root) %{_sysconfdir}/mods-enabled
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/mods-available/admin
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/mods-available/ssl
 %dir %attr(750,root,root) %{_sysconfdir}/sites-available
 %dir %attr(750,root,root) %{_sysconfdir}/sites-enabled
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/sites-available/default
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/sites-available/example.com
-%config(missingok) %{_sysconfdir}/sites-enabled/default
 %dir %attr(750,root,root) %{_sysconfdir}/ssl
 
 %config(noreplace) %verify(not md5 mtime size) /etc/pam.d/cherokee
@@ -178,9 +172,12 @@ fi
 %attr(754,root,root) /etc/rc.d/init.d/cherokee
 
 %attr(755,root,root) %{_bindir}/cget
+%attr(755,root,root) %{_bindir}/cherokee_tweak
+%attr(755,root,root) %{_bindir}/spawn-fcgi
 %attr(755,root,root) %{_sbindir}/cherokee
+%attr(755,root,root) %{_sbindir}/cherokee-guardian
 %attr(755,root,root) %{_sbindir}/cherokee-panic
-%attr(755,root,root) %{_sbindir}/cherokee_logrotate
+%attr(755,root,root) %{_sbindir}/cherokee-admin
 
 %dir %{_libdir}/cherokee
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_admin.so
@@ -190,17 +187,22 @@ fi
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_dirlist.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_error_redir.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_fastcgi.so
+%attr(755,root,root) %{_libdir}/cherokee/libplugin_fcgi.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_file.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_gzip.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_htdigest.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_htpasswd.so
+%attr(755,root,root) %{_libdir}/cherokee/libplugin_ldap.so
+%attr(755,root,root) %{_libdir}/cherokee/libplugin_mirror.so
+%attr(755,root,root) %{_libdir}/cherokee/libplugin_mysql.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_ncsa.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_nn.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_pam.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_phpcgi.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_plain.so
-%attr(755,root,root) %{_libdir}/cherokee/libplugin_read_config.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_redir.so
+%attr(755,root,root) %{_libdir}/cherokee/libplugin_round_robin.so
+%attr(755,root,root) %{_libdir}/cherokee/libplugin_scgi.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_server_info.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_w3c.so
 %attr(755,root,root) %{_libdir}/libcherokee-base.so.*.*.*

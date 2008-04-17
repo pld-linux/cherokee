@@ -1,13 +1,11 @@
---- cherokee-0.4.29/cherokee.conf.sample.pre.old	2005-10-20 00:27:03.000000000 +0300
-+++ cherokee-0.4.29/cherokee.conf.sample.pre	2005-12-31 16:32:18.000000000 +0200
-@@ -35,8 +35,8 @@
- ## Eg: User 65534
- ##     Group 65534
- ##
--#User nobody
--#Group nogroup
-+User cherokee
-+Group cherokee
+--- cherokee-0.6.1/cherokee.conf.sample.pre~	2008-03-18 22:09:32.000000000 +0100
++++ cherokee-0.6.1/cherokee.conf.sample.pre	2008-04-17 17:30:36.373880993 +0200
+@@ -8,6 +8,8 @@
  
- ##
- ## Chroot:
+ # Server
+ #
++server!user = cherokee
++server!group = cherokee
+ server!port = 80
+ server!port_tls = 443
+ server!timeout = 60
