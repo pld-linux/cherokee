@@ -11,17 +11,17 @@
 Summary:	Fast, Flexible and Lightweight Web server
 Summary(pl.UTF-8):	Cherokee - serwer WWW
 Name:		cherokee
-Version:	0.6.1
-Release:	0.1
+Version:	0.7.0
+Release:	1
 License:	GPL v2
 Group:		Networking/Daemons
-Source0:	http://www.cherokee-project.com/download/0.6/0.6.1/%{name}-%{version}.tar.gz
-# Source0-md5:	49044d6c9c50a6726a4e6c3c7f8ea544
+Source0:	http://www.cherokee-project.com/download/0.7/%{version}/%{name}-%{version}.tar.gz
+# Source0-md5:	43a904062b9592573f32ee586f04cb21
 Source1:	%{name}.init
 Source2:	%{name}.sysconfig
 Patch0:		%{name}-config.patch
 Patch1:		%{name}-php-path.patch
-URL:		http://www.0x50.org/
+URL:		http://www.cherokee-project.com/
 BuildRequires:	autoconf
 BuildRequires:	automake
 BuildRequires:	fcgi-devel
@@ -159,8 +159,6 @@ fi
 %doc AUTHORS ChangeLog TODO html
 %dir %attr(750,root,root) %{_sysconfdir}
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/cherokee.conf
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/mime.compression.types
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/mime.types
 %dir %attr(750,root,root) %{_sysconfdir}/mods-available
 %dir %attr(750,root,root) %{_sysconfdir}/mods-enabled
 %dir %attr(750,root,root) %{_sysconfdir}/sites-available
@@ -172,7 +170,7 @@ fi
 %attr(754,root,root) /etc/rc.d/init.d/cherokee
 
 %attr(755,root,root) %{_bindir}/cget
-%attr(755,root,root) %{_bindir}/cherokee_tweak
+%attr(755,root,root) %{_bindir}/cherokee-tweak
 %attr(755,root,root) %{_bindir}/spawn-fcgi
 %attr(755,root,root) %{_sbindir}/cherokee
 %attr(755,root,root) %{_sbindir}/cherokee-guardian
@@ -181,15 +179,19 @@ fi
 
 %dir %{_libdir}/cherokee
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_admin.so
+%attr(755,root,root) %{_libdir}/cherokee/libplugin_and.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_cgi.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_combined.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_common.so
+%attr(755,root,root) %{_libdir}/cherokee/libplugin_directory.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_dirlist.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_error_redir.so
+%attr(755,root,root) %{_libdir}/cherokee/libplugin_extensions.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_fastcgi.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_fcgi.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_file.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_gzip.so
+%attr(755,root,root) %{_libdir}/cherokee/libplugin_header.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_htdigest.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_htpasswd.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_ldap.so
@@ -197,24 +199,42 @@ fi
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_mysql.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_ncsa.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_nn.so
+%attr(755,root,root) %{_libdir}/cherokee/libplugin_not.so
+%attr(755,root,root) %{_libdir}/cherokee/libplugin_or.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_pam.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_phpcgi.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_plain.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_redir.so
+%attr(755,root,root) %{_libdir}/cherokee/libplugin_request.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_round_robin.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_scgi.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_server_info.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_w3c.so
 %attr(755,root,root) %{_libdir}/libcherokee-base.so.*.*.*
+%attr(755,root,root) %ghost %{_libdir}/libcherokee-base.so.0
 %attr(755,root,root) %{_libdir}/libcherokee-client.so.*.*.*
+%attr(755,root,root) %ghost %{_libdir}/libcherokee-client.so.0
 %attr(755,root,root) %{_libdir}/libcherokee-config.so.*.*.*
+%attr(755,root,root) %ghost %{_libdir}/libcherokee-config.so.0
 %attr(755,root,root) %{_libdir}/libcherokee-server.so.*.*.*
+%attr(755,root,root) %ghost %{_libdir}/libcherokee-server.so.0
 
-%{_mandir}/man1/cherokee.1*
 %{_mandir}/man1/cget.1*
-%{_mandir}/man1/cherokee_logrotate.1*
+%{_mandir}/man1/cherokee.1*
+%{_mandir}/man1/cherokee-admin.1*
+%{_mandir}/man1/cherokee_tweak.1*
+%{_mandir}/man1/spawn-fcgi.1*
 
-%{_datadir}/cherokee
+%dir %{_datadir}/cherokee
+%dir %{_datadir}/cherokee/admin
+%{_datadir}/cherokee/admin/cherokee.conf.sample
+%{_datadir}/cherokee/admin/*.html
+%attr(755,root,root) %{_datadir}/cherokee/admin/*.py
+%{_datadir}/cherokee/admin/static
+%{_datadir}/cherokee/deps
+%{_datadir}/cherokee/icons
+%{_datadir}/cherokee/mime_types.txt
+%{_datadir}/cherokee/themes
 
 %dir %{_wwwhome}
 %dir %{_wwwroot}
@@ -227,9 +247,13 @@ fi
 %attr(755,root,root) %{_bindir}/cherokee-config
 
 %{_libdir}/libcherokee-base.la
+%attr(755,root,root) %{_libdir}/libcherokee-base.so
 %{_libdir}/libcherokee-client.la
+%attr(755,root,root) %{_libdir}/libcherokee-client.so
 %{_libdir}/libcherokee-config.la
+%attr(755,root,root) %{_libdir}/libcherokee-config.so
 %{_libdir}/libcherokee-server.la
+%attr(755,root,root) %{_libdir}/libcherokee-server.so
 
 %{_includedir}/cherokee
 %{_pkgconfigdir}/cherokee.pc
