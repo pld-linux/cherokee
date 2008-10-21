@@ -1,7 +1,6 @@
 #
 # Conditional build:
-%bcond_without	php		# adds PHP support
-%bcond_with	mono		# adds ASPX support
+%bcond_without	geoip		# without GeoIP support
 %bcond_without	gnutls		# build with tls=gnutls
 %bcond_with	openssl		# build with tls=openssl
 #
@@ -11,12 +10,12 @@
 Summary:	Fast, Flexible and Lightweight Web server
 Summary(pl.UTF-8):	Cherokee - serwer WWW
 Name:		cherokee
-Version:	0.7.0
+Version:	0.9.4
 Release:	1
 License:	GPL v2
 Group:		Networking/Daemons
-Source0:	http://www.cherokee-project.com/download/0.7/%{version}/%{name}-%{version}.tar.gz
-# Source0-md5:	43a904062b9592573f32ee586f04cb21
+Source0:	http://www.cherokee-project.com/download/0.9/%{version}/%{name}-%{version}.tar.gz
+# Source0-md5:	33a43d67baa93029c5fc60ef9f2520bd
 Source1:	%{name}.init
 Source2:	%{name}.sysconfig
 Patch0:		%{name}-config.patch
@@ -24,8 +23,9 @@ Patch1:		%{name}-php-path.patch
 URL:		http://www.cherokee-project.com/
 BuildRequires:	autoconf
 BuildRequires:	automake
-BuildRequires:	fcgi-devel
+BuildRequires:	GeoIP-devel
 %{?with_gnutls:BuildRequires:	gnutls-devel >= 0.9.99}
+BuildRequires:	libtool
 BuildRequires:	mysql-devel
 BuildRequires:	openldap-devel
 %{?with_openssl:BuildRequires:	openssl-devel}
@@ -33,6 +33,7 @@ BuildRequires:	pam-devel
 BuildRequires:	pcre-devel
 BuildRequires:	pkgconfig
 BuildRequires:	python-docutils
+BuildRequires:	rpm-pythonprov
 BuildRequires:	rpmbuild(macros) >= 1.268
 BuildRequires:	zlib-devel
 Requires(post,postun):	/sbin/ldconfig
@@ -43,6 +44,7 @@ Requires(pre):	/bin/id
 Requires(pre):	/usr/bin/getgid
 Requires(pre):	/usr/sbin/groupadd
 Requires(pre):	/usr/sbin/useradd
+Suggests:	php-fcgi
 Provides:	group(cherokee)
 Provides:	group(http)
 Provides:	user(cherokee)
@@ -88,19 +90,18 @@ Pliki nagłówkowe dla serwera WWW Cherokee.
 %patch1 -p1
 
 %build
+%{__libtoolize}
 %{__aclocal} -I m4
 %{__autoconf}
 %{__autoheader}
 %{__automake}
 %configure \
-	--sysconfdir=/etc \
-	--enable-os-string="PLD Linux" \
-	--with-wwwroot=%{_wwwroot} \
 	--disable-static \
+	--enable-os-string="PLD Linux" \
 	%{?with_tls:--enable-tls=%{?with_gnutls:gnutls}%{?with_openssl:openssl}} \
-	--enable-pthreads \
-	%{?with_php:--with-php=%{_prefix}} \
-	%{?with_mono:--with-mono=DIR}
+	--sysconfdir=/etc \
+	--with-wwwroot=%{_wwwroot} \
+	PHPCGI=%{_bindir}/php.fcgi
 
 %{__make}
 
@@ -116,7 +117,6 @@ install %{SOURCE2} $RPM_BUILD_ROOT/etc/sysconfig/%{name}
 
 # users don't need this
 mv $RPM_BUILD_ROOT{%{_bindir},%{_sbindir}}/cherokee-panic
-#mv $RPM_BUILD_ROOT{%{_bindir},%{_sbindir}}/cherokee_logrotate
 
 # modules dlopened by *.so
 rm -f $RPM_BUILD_ROOT%{_libdir}/cherokee/lib*.la
@@ -156,13 +156,9 @@ fi
 
 %files
 %defattr(644,root,root,755)
-%doc AUTHORS ChangeLog TODO html
+%doc AUTHORS ChangeLog TODO html contrib/*to*.py
 %dir %attr(750,root,root) %{_sysconfdir}
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/cherokee.conf
-%dir %attr(750,root,root) %{_sysconfdir}/mods-available
-%dir %attr(750,root,root) %{_sysconfdir}/mods-enabled
-%dir %attr(750,root,root) %{_sysconfdir}/sites-available
-%dir %attr(750,root,root) %{_sysconfdir}/sites-enabled
 %dir %attr(750,root,root) %{_sysconfdir}/ssl
 
 %config(noreplace) %verify(not md5 mtime size) /etc/pam.d/cherokee
@@ -173,9 +169,9 @@ fi
 %attr(755,root,root) %{_bindir}/cherokee-tweak
 %attr(755,root,root) %{_bindir}/spawn-fcgi
 %attr(755,root,root) %{_sbindir}/cherokee
-%attr(755,root,root) %{_sbindir}/cherokee-guardian
-%attr(755,root,root) %{_sbindir}/cherokee-panic
 %attr(755,root,root) %{_sbindir}/cherokee-admin
+%attr(755,root,root) %{_sbindir}/cherokee-panic
+%attr(755,root,root) %{_sbindir}/cherokee-worker
 
 %dir %{_libdir}/cherokee
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_admin.so
@@ -183,13 +179,18 @@ fi
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_cgi.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_combined.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_common.so
+%attr(755,root,root) %{_libdir}/cherokee/libplugin_custom_error.so
+%attr(755,root,root) %{_libdir}/cherokee/libplugin_dbslayer.so
+%attr(755,root,root) %{_libdir}/cherokee/libplugin_deflate.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_directory.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_dirlist.so
+%attr(755,root,root) %{_libdir}/cherokee/libplugin_error_nn.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_error_redir.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_extensions.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_fastcgi.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_fcgi.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_file.so
+%attr(755,root,root) %{_libdir}/cherokee/libplugin_geoip.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_gzip.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_header.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_htdigest.so
@@ -198,12 +199,12 @@ fi
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_mirror.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_mysql.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_ncsa.so
-%attr(755,root,root) %{_libdir}/cherokee/libplugin_nn.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_not.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_or.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_pam.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_phpcgi.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_plain.so
+%attr(755,root,root) %{_libdir}/cherokee/libplugin_proxy.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_redir.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_request.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_round_robin.so
@@ -222,8 +223,10 @@ fi
 %{_mandir}/man1/cget.1*
 %{_mandir}/man1/cherokee.1*
 %{_mandir}/man1/cherokee-admin.1*
-%{_mandir}/man1/cherokee_tweak.1*
-%{_mandir}/man1/spawn-fcgi.1*
+%{_mandir}/man1/cherokee-tweak.1*
+%{_mandir}/man1/cherokee-worker.1*
+# Conflicts: lighttpd
+#%%{_mandir}/man1/spawn-fcgi.1*
 
 %dir %{_datadir}/cherokee
 %dir %{_datadir}/cherokee/admin
@@ -240,7 +243,7 @@ fi
 %dir %{_wwwroot}
 %config(missingok) %{_wwwroot}/*
 
-%dir %attr(750,root,logs) /var/log/%{name}
+%dir %attr(750,cherokee,logs) /var/log/%{name}
 
 %files devel
 %defattr(644,root,root,755)
