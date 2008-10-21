@@ -1,5 +1,5 @@
---- cherokee-0.6.1/cherokee.conf.sample.pre~	2008-03-18 22:09:32.000000000 +0100
-+++ cherokee-0.6.1/cherokee.conf.sample.pre	2008-04-17 17:30:36.373880993 +0200
+--- cherokee-0.9.4/cherokee.conf.sample.pre.orig	2008-09-26 23:29:36.000000000 +0200
++++ cherokee-0.9.4/cherokee.conf.sample.pre	2008-10-21 01:15:39.000000000 +0200
 @@ -8,6 +8,8 @@
  
  # Server
@@ -8,4 +8,26 @@
 +server!group = cherokee
  server!port = 80
  server!port_tls = 443
- server!timeout = 60
+ server!timeout = 15
+@@ -16,7 +16,7 @@
+ server!keepalive = 1
+ server!keepalive_max_requests = 500
+ server!server_tokens = full
+-server!panic_action = %prefix%/bin/cherokee-panic
++server!panic_action = %prefix%/sbin/cherokee-panic
+ server!pid_file = %localstatedir%/run/cherokee.pid
+ 
+ # Default virtual server
+@@ -25,10 +27,10 @@
+ 
+ vserver!1!logger = combined
+ vserver!1!logger!access!type = file
+-vserver!1!logger!access!filename = %localstatedir%/log/cherokee.access
++vserver!1!logger!access!filename = %localstatedir%/log/cherokee/cherokee.access
+ vserver!1!logger!access!buffsize = 16384
+ vserver!1!logger!error!type = file
+-vserver!1!logger!error!filename = %localstatedir%/log/cherokee.error
++vserver!1!logger!error!filename = %localstatedir%/log/cherokee/cherokee.error
+ 
+ vserver!1!rule!1!match = default
+ vserver!1!rule!1!handler = common
