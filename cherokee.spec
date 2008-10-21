@@ -21,9 +21,9 @@ Source2:	%{name}.sysconfig
 Patch0:		%{name}-config.patch
 Patch1:		%{name}-php-path.patch
 URL:		http://www.cherokee-project.com/
+%{?with_geoip:BuildRequires:	GeoIP-devel}
 BuildRequires:	autoconf
 BuildRequires:	automake
-%{?with_geoip:BuildRequires:	GeoIP-devel}
 %{?with_gnutls:BuildRequires:	gnutls-devel >= 0.9.99}
 BuildRequires:	libtool
 BuildRequires:	mysql-devel
