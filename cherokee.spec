@@ -23,7 +23,7 @@ Patch1:		%{name}-php-path.patch
 URL:		http://www.cherokee-project.com/
 BuildRequires:	autoconf
 BuildRequires:	automake
-BuildRequires:	GeoIP-devel
+%{?with_geoip:BuildRequires:	GeoIP-devel}
 %{?with_gnutls:BuildRequires:	gnutls-devel >= 0.9.99}
 BuildRequires:	libtool
 BuildRequires:	mysql-devel
@@ -101,6 +101,7 @@ Pliki nagłówkowe dla serwera WWW Cherokee.
 	%{?with_tls:--enable-tls=%{?with_gnutls:gnutls}%{?with_openssl:openssl}} \
 	--sysconfdir=/etc \
 	--with-wwwroot=%{_wwwroot} \
+	%{!?with_geoip:--without-geoip} \
 	PHPCGI=%{_bindir}/php.fcgi
 
 %{__make}
@@ -190,7 +191,7 @@ fi
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_fastcgi.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_fcgi.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_file.so
-%attr(755,root,root) %{_libdir}/cherokee/libplugin_geoip.so
+%{?with_geoip:%attr(755,root,root) %{_libdir}/cherokee/libplugin_geoip.so}
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_gzip.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_header.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_htdigest.so
