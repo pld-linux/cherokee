@@ -27,9 +27,7 @@ else
 	exit 0
 fi
 
-# See how we were called.
-case "$1" in
-  start)
+start() {
 	# Check if the service is already running?
 	if [ ! -f /var/lock/subsys/cherokee ]; then
 		msg_starting "Cherokee Web Server"
@@ -49,8 +47,9 @@ case "$1" in
 	else
 		msg_already_running "Cherokee Web Server"
 	fi
-	;;
-  stop)
+}
+
+stop() {
 	if [ -f /var/lock/subsys/cherokee ]; then
 		# Stop daemons.
 		msg_stopping "Cherokee Web Server"
@@ -65,22 +64,44 @@ case "$1" in
 	else
 		msg_not_running "Cherokee Web Server"
 	fi
+}
+
+condrestart() {
+	if [ -f /var/lock/subsys/cherokee ]; then
+		stop
+		start
+	else
+		msg_not_running "Cherokee Web Server"
+		RETVAL=$1
+	fi
+}
+
+RETVAL=0
+# See how we were called.
+case "$1" in
+  start)
+  	start
 	;;
-  restart|force-reload)
-	$0 stop
-	$0 start
-	exit $?
+  stop)
+  	stop
+	;;
+  restart)
+	stop
+	start
+	;;
+  try-restart)
+	condrestart 0
+	;;
+  force-reload)
+	condrestart 7
 	;;
   status)
 	status cherokee
 	RETVAL=$?
 	;;
   *)
-	msg_usage "$0 {start|stop|restart|force-reload|status}"
+	msg_usage "$0 {start|stop|restart|try-restart|force-reload|status}"
 	exit 3
 esac
 
 exit $RETVAL
-
-# This must be last line !
-# vi:syntax=sh
