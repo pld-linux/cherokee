@@ -36,7 +36,6 @@ BuildRequires:	python-docutils
 BuildRequires:	rpm-pythonprov
 BuildRequires:	rpmbuild(macros) >= 1.268
 BuildRequires:	zlib-devel
-Requires(post,postun):	/sbin/ldconfig
 Requires(post,preun):	rc-scripts
 Requires(postun):	/usr/sbin/groupdel
 Requires(postun):	/usr/sbin/userdel
@@ -44,6 +43,7 @@ Requires(pre):	/bin/id
 Requires(pre):	/usr/bin/getgid
 Requires(pre):	/usr/sbin/groupadd
 Requires(pre):	/usr/sbin/useradd
+Requires:	%{name}-libs = %{version}-%{release}
 Suggests:	php-fcgi
 Provides:	group(cherokee)
 Provides:	group(http)
@@ -72,11 +72,22 @@ znaków, TLS/SSL (poprzez GNUTLS lub OpenSSL), hosty wirtualne,
 uwierzytelnianie, opcje związane z pamięcią podręczną, PHP, własne
 zarządzanie błędami i wiele więcej.
 
+%package libs
+Summary:	Cherokee web server libraries
+Summary(pl.UTF-8):	Biblioteki serwera WWW Cherokee
+Group:		Libraries
+
+%description libs
+Cherokee web server libraries.
+
+%description libs -l pl.UTF-8
+Biblioteki serwera WWW Cherokee.
+
 %package devel
 Summary:	Header files for Cherokee web server
 Summary(pl.UTF-8):	Pliki nagłówkowe dla serwera WWW Cherokee
 Group:		Development/Libraries
-Requires:	%{name} = %{version}-%{release}
+Requires:	%{name}-libs = %{version}-%{release}
 
 %description devel
 Header files for Cherokee web server.
@@ -136,7 +147,6 @@ rm -rf $RPM_BUILD_ROOT
 %addusertogroup cherokee http
 
 %post
-/sbin/ldconfig
 /sbin/chkconfig --add %{name}
 %service %{name} restart "Cherokee webserver"
 exit 0
@@ -148,12 +158,14 @@ if [ "$1" = "0" ]; then
 fi
 
 %postun
-/sbin/ldconfig
 if [ "$1" = "0" ]; then
 	%userremove cherokee
 	%groupremove cherokee
 	%groupremove http
 fi
+
+%post	libs -p /sbin/ldconfig
+%postun	libs -p /sbin/ldconfig
 
 %files
 %defattr(644,root,root,755)
@@ -212,14 +224,6 @@ fi
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_scgi.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_server_info.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_w3c.so
-%attr(755,root,root) %{_libdir}/libcherokee-base.so.*.*.*
-%attr(755,root,root) %ghost %{_libdir}/libcherokee-base.so.0
-%attr(755,root,root) %{_libdir}/libcherokee-client.so.*.*.*
-%attr(755,root,root) %ghost %{_libdir}/libcherokee-client.so.0
-%attr(755,root,root) %{_libdir}/libcherokee-config.so.*.*.*
-%attr(755,root,root) %ghost %{_libdir}/libcherokee-config.so.0
-%attr(755,root,root) %{_libdir}/libcherokee-server.so.*.*.*
-%attr(755,root,root) %ghost %{_libdir}/libcherokee-server.so.0
 
 %{_mandir}/man1/cget.1*
 %{_mandir}/man1/cherokee.1*
@@ -246,19 +250,28 @@ fi
 
 %dir %attr(750,cherokee,logs) /var/log/%{name}
 
+%files libs
+%defattr(644,root,root,755)
+%attr(755,root,root) %{_libdir}/libcherokee-base.so.*.*.*
+%attr(755,root,root) %ghost %{_libdir}/libcherokee-base.so.0
+%attr(755,root,root) %{_libdir}/libcherokee-client.so.*.*.*
+%attr(755,root,root) %ghost %{_libdir}/libcherokee-client.so.0
+%attr(755,root,root) %{_libdir}/libcherokee-config.so.*.*.*
+%attr(755,root,root) %ghost %{_libdir}/libcherokee-config.so.0
+%attr(755,root,root) %{_libdir}/libcherokee-server.so.*.*.*
+%attr(755,root,root) %ghost %{_libdir}/libcherokee-server.so.0
+
 %files devel
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_bindir}/cherokee-config
-
-%{_libdir}/libcherokee-base.la
 %attr(755,root,root) %{_libdir}/libcherokee-base.so
-%{_libdir}/libcherokee-client.la
 %attr(755,root,root) %{_libdir}/libcherokee-client.so
-%{_libdir}/libcherokee-config.la
 %attr(755,root,root) %{_libdir}/libcherokee-config.so
-%{_libdir}/libcherokee-server.la
 %attr(755,root,root) %{_libdir}/libcherokee-server.so
-
+%{_libdir}/libcherokee-base.la
+%{_libdir}/libcherokee-client.la
+%{_libdir}/libcherokee-config.la
+%{_libdir}/libcherokee-server.la
 %{_includedir}/cherokee
 %{_pkgconfigdir}/cherokee.pc
 %{_aclocaldir}/cherokee.m4
