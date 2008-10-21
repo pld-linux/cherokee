@@ -5,7 +5,24 @@
  	"php5", 
  	"php4", 
 -	"php-cgi",
-+	"php.cgi",
++	"php.fcgi",
  #else
  	"PHP.EXE",
  #endif
+--- cherokee-0.9.4/configure.in.orig	2008-10-09 13:41:48.000000000 +0200
++++ cherokee-0.9.4/configure.in	2008-10-21 01:20:27.000000000 +0200
+@@ -1145,13 +1145,7 @@
+ if test "x$PHPCGI" = "x"; then
+    AC_MSG_RESULT([no])
+ else
+-   $PHPCGI -v | grep 'cgi-fcgi' >/dev/null 2>/dev/null
+-   if test $? != 0; then
+-      PHPCGI=""
+-      AC_MSG_RESULT([no])
+-   else
+-      AC_MSG_RESULT([yes])
+-   fi
++   AC_MSG_RESULT([yes])
+ fi
+ 
+ if test "x$PHPCGI" = "x"; then

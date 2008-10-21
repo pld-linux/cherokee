@@ -37,7 +37,7 @@ case "$1" in
 		# it offers no stdout/stderr logging. workaround
 		exec 2>>/var/log/cherokee/cherokee.log
 		exec 1>&2
-		start-stop-daemon --start --exec /usr/sbin/cherokee-guardian -- -b
+		start-stop-daemon --start --pidfile /var/run/cherokee.pid --oknodo -b --exec /usr/sbin/cherokee
 		)
 		RETVAL=$?
 		if [ $RETVAL -eq 0 ]; then
@@ -54,7 +54,7 @@ case "$1" in
 	if [ -f /var/lock/subsys/cherokee ]; then
 		# Stop daemons.
 		msg_stopping "Cherokee Web Server"
-		start-stop-daemon --stop --pidfile /var/run/cherokee-guardian.pid --oknodo --exec /usr/sbin/cherokee-guardian
+		start-stop-daemon --stop --pidfile /var/run/cherokee.pid --oknodo --exec /usr/sbin/cherokee
 		RETVAL=$?
 		if [ $RETVAL -eq 0 ]; then
 			rm -f /var/lock/subsys/cherokee >/dev/null 2>&1
