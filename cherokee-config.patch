@@ -1,15 +1,15 @@
---- cherokee-0.9.4/cherokee.conf.sample.pre.orig	2008-09-26 23:29:36.000000000 +0200
-+++ cherokee-0.9.4/cherokee.conf.sample.pre	2008-10-21 01:15:39.000000000 +0200
-@@ -8,6 +8,8 @@
+--- cherokee-0.99.29/cherokee.conf.sample.pre.orig	2009-11-15 16:24:35.000000000 +0100
++++ cherokee-0.99.29/cherokee.conf.sample.pre	2009-11-28 02:04:28.000000000 +0100
+@@ -11,6 +11,8 @@
  
  # Server
  #
 +server!user = cherokee
 +server!group = cherokee
- server!port = 80
- server!port_tls = 443
+ server!bind!1!port = 80
  server!timeout = 15
-@@ -25,10 +27,10 @@
+ server!keepalive = 1
+@@ -27,10 +29,10 @@
  
  vserver!1!logger = combined
  vserver!1!logger!access!type = file
