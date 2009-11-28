@@ -1,12 +1,16 @@
+# TODO:
+# - does it requires spawn-fcgi?
+# - warning: Installed (but unpackaged) file(s) found:
+#   /usr/share/locale/de/LC_MESSAGES/cherokee.mo
+#   /usr/share/locale/en/LC_MESSAGES/cherokee.mo
+#   /usr/share/locale/es/LC_MESSAGES/cherokee.mo
+#   /usr/share/locale/nl/LC_MESSAGES/cherokee.mo
+#   /usr/share/locale/sv_SE/LC_MESSAGES/cherokee.mo
+#   /usr/share/locale/zh_CN/LC_MESSAGES/cherokee.mo
 #
 # Conditional build:
 %bcond_without	geoip		# without GeoIP support
-%bcond_without	gnutls		# build with tls=gnutls
-%bcond_with	openssl		# build with tls=openssl
 #
-%if %{with gnutls} || %{with openssl}
-%define	with_tls 1
-%endif
 Summary:	Fast, Flexible and Lightweight Web server
 Summary(pl.UTF-8):	Cherokee - serwer WWW
 Name:		cherokee
@@ -25,13 +29,14 @@ URL:		http://www.cherokee-project.com/
 %{?with_geoip:BuildRequires:	GeoIP-devel}
 BuildRequires:	autoconf
 BuildRequires:	automake
-%{?with_gnutls:BuildRequires:	gnutls-devel >= 0.9.99}
+BuildRequires:	ffmpeg-devel
 BuildRequires:	libtool
 BuildRequires:	mysql-devel
 BuildRequires:	openldap-devel
-%{?with_openssl:BuildRequires:	openssl-devel}
+BuildRequires:	openssl-devel
 BuildRequires:	pam-devel
 BuildRequires:	pcre-devel
+BuildRequires:	php-fcgi
 BuildRequires:	pkgconfig
 BuildRequires:	python-docutils
 BuildRequires:	rpm-pythonprov
@@ -60,18 +65,18 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 Cherokee is a flexible, very fast, lightweight Web server. It is
 implemented entirely in C, and has no dependencies beyond a standard C
 library. It is embeddable and extensible with plug-ins. It supports
-on-the-fly configuration by reading files or strings, TLS/SSL (via
-GNUTLS or OpenSSL), virtual hosts, authentication, cache friendly
-features, PHP, custom error management, and much more.
+on-the-fly configuration by reading files or strings, TLS/SSL via
+OpenSSL, virtual hosts, authentication, cache friendly features, PHP,
+custom error management, and much more.
 
 %description -l pl.UTF-8
 Cherokee to elastyczny, bardzo szybki i lekki serwer WWW. Jest
 zaimplementowany całkowicie w C i nie ma zależności poza standardową
 biblioteką C. Jest osadzalny i rozbudowywalny poprzez wtyczki.
 Obsługuje konfigurację w locie poprzez odczyt plików lub łańcuchów
-znaków, TLS/SSL (poprzez GNUTLS lub OpenSSL), hosty wirtualne,
-uwierzytelnianie, opcje związane z pamięcią podręczną, PHP, własne
-zarządzanie błędami i wiele więcej.
+znaków, TLS/SSL poprzez OpenSSL, hosty wirtualne, uwierzytelnianie,
+opcje związane z pamięcią podręczną, PHP, własne zarządzanie błędami i
+wiele więcej.
 
 %package libs
 Summary:	Cherokee web server libraries
@@ -108,15 +113,15 @@ Pliki nagłówkowe dla serwera WWW Cherokee.
 %{__autoconf}
 %{__autoheader}
 %{__automake}
+export PHPCGI=%{_bindir}/php.fcgi
 %configure \
 	--disable-static \
 	--enable-os-string="PLD Linux" \
-	%{?with_tls:--enable-tls=%{?with_gnutls:gnutls}%{?with_openssl:openssl}} \
 	--sysconfdir=/etc \
 	--with-wwwroot=%{_wwwroot} \
-	%{!?with_geoip:--without-geoip} \
-	PHPCGI=%{_bindir}/php.fcgi
-
+	--with-wwwuser=cherokee \
+	--with-wwwgroup=http \
+	%{!?with_geoip:--without-geoip}
 %{__make}
 
 %install
@@ -171,10 +176,9 @@ fi
 
 %files
 %defattr(644,root,root,755)
-%doc AUTHORS ChangeLog TODO html contrib/*to*.py
+%doc AUTHORS ChangeLog html contrib/*to*.py
 %dir %attr(750,root,root) %{_sysconfdir}
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/cherokee.conf
-%dir %attr(750,root,root) %{_sysconfdir}/ssl
 
 %config(noreplace) %verify(not md5 mtime size) /etc/pam.d/cherokee
 %config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/cherokee
@@ -182,7 +186,6 @@ fi
 
 %attr(755,root,root) %{_bindir}/cget
 %attr(755,root,root) %{_bindir}/cherokee-tweak
-%attr(755,root,root) %{_bindir}/spawn-fcgi
 %attr(755,root,root) %{_sbindir}/cherokee
 %attr(755,root,root) %{_sbindir}/cherokee-admin
 %attr(755,root,root) %{_sbindir}/cherokee-panic
@@ -191,59 +194,74 @@ fi
 %dir %{_libdir}/cherokee
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_admin.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_and.so
+%attr(755,root,root) %{_libdir}/cherokee/libplugin_authlist.so
+%attr(755,root,root) %{_libdir}/cherokee/libplugin_bind.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_cgi.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_combined.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_common.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_custom_error.so
+%attr(755,root,root) %{_libdir}/cherokee/libplugin_custom.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_dbslayer.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_deflate.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_directory.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_dirlist.so
+%attr(755,root,root) %{_libdir}/cherokee/libplugin_empty_gif.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_error_nn.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_error_redir.so
+%attr(755,root,root) %{_libdir}/cherokee/libplugin_evhost.so
+%attr(755,root,root) %{_libdir}/cherokee/libplugin_exists.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_extensions.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_fastcgi.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_fcgi.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_file.so
+%attr(755,root,root) %{_libdir}/cherokee/libplugin_from.so
+%attr(755,root,root) %{_libdir}/cherokee/libplugin_fullpath.so
 %{?with_geoip:%attr(755,root,root) %{_libdir}/cherokee/libplugin_geoip.so}
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_gzip.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_header.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_htdigest.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_htpasswd.so
+%attr(755,root,root) %{_libdir}/cherokee/libplugin_ip_hash.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_ldap.so
-%attr(755,root,root) %{_libdir}/cherokee/libplugin_mirror.so
+%attr(755,root,root) %{_libdir}/cherokee/libplugin_libssl.so
+%attr(755,root,root) %{_libdir}/cherokee/libplugin_method.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_mysql.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_ncsa.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_not.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_or.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_pam.so
-%attr(755,root,root) %{_libdir}/cherokee/libplugin_phpcgi.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_plain.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_proxy.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_redir.so
+%attr(755,root,root) %{_libdir}/cherokee/libplugin_rehost.so
+%attr(755,root,root) %{_libdir}/cherokee/libplugin_render_rrd.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_request.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_round_robin.so
+%attr(755,root,root) %{_libdir}/cherokee/libplugin_rrd.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_scgi.so
+%attr(755,root,root) %{_libdir}/cherokee/libplugin_secdownload.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_server_info.so
-%attr(755,root,root) %{_libdir}/cherokee/libplugin_w3c.so
+%attr(755,root,root) %{_libdir}/cherokee/libplugin_ssi.so
+%attr(755,root,root) %{_libdir}/cherokee/libplugin_streaming.so
+%attr(755,root,root) %{_libdir}/cherokee/libplugin_target_ip.so
+%attr(755,root,root) %{_libdir}/cherokee/libplugin_uwsgi.so
+%attr(755,root,root) %{_libdir}/cherokee/libplugin_wildcard.so
 
 %{_mandir}/man1/cget.1*
 %{_mandir}/man1/cherokee.1*
 %{_mandir}/man1/cherokee-admin.1*
 %{_mandir}/man1/cherokee-tweak.1*
 %{_mandir}/man1/cherokee-worker.1*
-# Conflicts: lighttpd
-#%%{_mandir}/man1/spawn-fcgi.1*
 
 %dir %{_datadir}/cherokee
 %dir %{_datadir}/cherokee/admin
 %{_datadir}/cherokee/admin/cherokee.conf.sample
+%{_datadir}/cherokee/admin/performance.conf.sample
 %{_datadir}/cherokee/admin/*.html
 %attr(755,root,root) %{_datadir}/cherokee/admin/*.py
 %{_datadir}/cherokee/admin/static
 %{_datadir}/cherokee/deps
 %{_datadir}/cherokee/icons
-%{_datadir}/cherokee/mime_types.txt
 %{_datadir}/cherokee/themes
 
 %dir %{_wwwhome}
