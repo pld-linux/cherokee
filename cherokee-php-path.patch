@@ -1,21 +1,10 @@
---- cherokee-0.6.1/cherokee/handler_phpcgi.c~	2008-04-17 16:41:42.000000000 +0200
-+++ cherokee-0.6.1/cherokee/handler_phpcgi.c	2008-04-17 16:45:23.471106094 +0200
-@@ -71,7 +71,7 @@
- 	"php", 
- 	"php5", 
- 	"php4", 
--	"php-cgi",
-+	"php.fcgi",
- #else
- 	"PHP.EXE",
- #endif
---- cherokee-0.9.4/configure.in.orig	2008-10-09 13:41:48.000000000 +0200
-+++ cherokee-0.9.4/configure.in	2008-10-21 01:20:27.000000000 +0200
-@@ -1145,13 +1145,7 @@
+--- cherokee-0.99.29/configure.in.orig	2009-11-16 17:42:47.000000000 +0100
++++ cherokee-0.99.29/configure.in	2009-11-28 02:11:19.000000000 +0100
+@@ -1281,13 +1281,7 @@
  if test "x$PHPCGI" = "x"; then
     AC_MSG_RESULT([no])
  else
--   $PHPCGI -v | grep 'cgi-fcgi' >/dev/null 2>/dev/null
+-   $PHPCGI -v -d session.save_path=/tmp | grep 'cgi-fcgi' >/dev/null 2>/dev/null
 -   if test $? != 0; then
 -      PHPCGI=""
 -      AC_MSG_RESULT([no])
