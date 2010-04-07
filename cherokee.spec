@@ -1,8 +1,12 @@
 # TODO:
-# - does it requires spawn-fcgi?
+#   - does it requires spawn-fcgi?
+#   - move modules to subpackages. At least, those with extra dependencies.
 #
 # Conditional build:
 %bcond_without	geoip		# without GeoIP support
+%bcond_without	mysql		# without MySQL support
+%bcond_without	ldap		# without LDAP support
+%bcond_without	ffmpeg		# without ffmpeg support
 #
 Summary:	Fast, Flexible and Lightweight Web server
 Summary(pl.UTF-8):	Cherokee - serwer WWW
@@ -22,10 +26,10 @@ URL:		http://www.cherokee-project.com/
 %{?with_geoip:BuildRequires:	GeoIP-devel}
 BuildRequires:	autoconf
 BuildRequires:	automake
-BuildRequires:	ffmpeg-devel
+%{?with_ffmpeg:BuildRequires:	ffmpeg-devel}
 BuildRequires:	libtool
-BuildRequires:	mysql-devel
-BuildRequires:	openldap-devel
+%{?with_mysql:BuildRequires:	mysql-devel}
+%{?with_ldap:BuildRequires:	openldap-devel}
 BuildRequires:	openssl-devel
 BuildRequires:	pam-devel
 BuildRequires:	pcre-devel
@@ -114,7 +118,10 @@ export PHPCGI=%{_bindir}/php.fcgi
 	--with-wwwroot=%{_wwwroot} \
 	--with-wwwuser=cherokee \
 	--with-wwwgroup=http \
-	%{!?with_geoip:--without-geoip}
+	%{!?with_geoip:--without-geoip} \
+	%{!?with_mysql:--without-mysql} \
+	%{!?with_ffmpeg:--without-ffmpeg} \
+	%{!?with_ldap:--without-ldap}
 %{__make}
 
 %install
@@ -199,7 +206,7 @@ fi
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_common.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_custom_error.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_custom.so
-%attr(755,root,root) %{_libdir}/cherokee/libplugin_dbslayer.so
+%{?with_mysql:%attr(755,root,root) %{_libdir}/cherokee/libplugin_dbslayer.so}
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_deflate.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_directory.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_dirlist.so
@@ -220,10 +227,10 @@ fi
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_htdigest.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_htpasswd.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_ip_hash.so
-%attr(755,root,root) %{_libdir}/cherokee/libplugin_ldap.so
+%{?with_ldap:%attr(755,root,root) %{_libdir}/cherokee/libplugin_ldap.so}
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_libssl.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_method.so
-%attr(755,root,root) %{_libdir}/cherokee/libplugin_mysql.so
+%{?with_mysql:%attr(755,root,root) %{_libdir}/cherokee/libplugin_mysql.so}
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_ncsa.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_not.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_or.so
