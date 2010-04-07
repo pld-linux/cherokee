@@ -48,6 +48,7 @@ Requires(pre):	/usr/sbin/groupadd
 Requires(pre):	/usr/sbin/useradd
 Requires:	%{name}-libs = %{version}-%{release}
 Suggests:	php-fcgi
+Suggests:	%{name}-admin = %{version}-%{release}
 Provides:	group(cherokee)
 Provides:	group(http)
 Provides:	user(cherokee)
@@ -75,16 +76,19 @@ znaków, TLS/SSL poprzez OpenSSL, hosty wirtualne, uwierzytelnianie,
 opcje związane z pamięcią podręczną, PHP, własne zarządzanie błędami i
 wiele więcej.
 
-%package libs
-Summary:	Cherokee web server libraries
-Summary(pl.UTF-8):	Biblioteki serwera WWW Cherokee
-Group:		Libraries
+%package admin
+Summary:	Cherokee web server administration interface
+Summary(pl.UTF-8):	Interfejs administracyjny serwera WWW Cherokee
+Group:		Networking/Daemons
+Requires:	python
+Requires:	python-modules
+Requires:	%{name} = %{version}-%{release}
 
-%description libs
-Cherokee web server libraries.
+%description admin
+Cherokee web server administration interface.
 
-%description libs -l pl.UTF-8
-Biblioteki serwera WWW Cherokee.
+%description admin -l pl.UTF-8
+Interfejs administracyjny serwera WWW Cherokee.
 
 %package devel
 Summary:	Header files for Cherokee web server
@@ -97,6 +101,17 @@ Header files for Cherokee web server.
 
 %description devel -l pl.UTF-8
 Pliki nagłówkowe dla serwera WWW Cherokee.
+
+%package libs
+Summary:	Cherokee web server libraries
+Summary(pl.UTF-8):	Biblioteki serwera WWW Cherokee
+Group:		Libraries
+
+%description libs
+Cherokee web server libraries.
+
+%description libs -l pl.UTF-8
+Biblioteki serwera WWW Cherokee.
 
 %prep
 %setup -q
@@ -179,7 +194,7 @@ fi
 %post	libs -p /sbin/ldconfig
 %postun	libs -p /sbin/ldconfig
 
-%files -f %{name}.lang
+%files
 %defattr(644,root,root,755)
 %doc AUTHORS ChangeLog html contrib/*to*.py performance.conf.sample
 %dir %attr(750,root,root) %{_sysconfdir}
@@ -192,7 +207,6 @@ fi
 %attr(755,root,root) %{_bindir}/cget
 %attr(755,root,root) %{_bindir}/cherokee-tweak
 %attr(755,root,root) %{_sbindir}/cherokee
-%attr(755,root,root) %{_sbindir}/cherokee-admin
 %attr(755,root,root) %{_sbindir}/cherokee-panic
 %attr(755,root,root) %{_sbindir}/cherokee-worker
 
@@ -257,17 +271,10 @@ fi
 
 %{_mandir}/man1/cget.1*
 %{_mandir}/man1/cherokee.1*
-%{_mandir}/man1/cherokee-admin.1*
 %{_mandir}/man1/cherokee-tweak.1*
 %{_mandir}/man1/cherokee-worker.1*
 
 %dir %{_datadir}/cherokee
-%dir %{_datadir}/cherokee/admin
-%{_datadir}/cherokee/admin/cherokee.conf.sample
-%{_datadir}/cherokee/admin/performance.conf.sample
-%{_datadir}/cherokee/admin/*.html
-%attr(755,root,root) %{_datadir}/cherokee/admin/*.py
-%{_datadir}/cherokee/admin/static
 %{_datadir}/cherokee/deps
 %{_datadir}/cherokee/icons
 %{_datadir}/cherokee/themes
@@ -277,6 +284,17 @@ fi
 %config(missingok) %{_wwwroot}/*
 
 %dir %attr(750,cherokee,logs) /var/log/%{name}
+
+%files admin -f %{name}.lang
+%defattr(644,root,root,755)
+%attr(755,root,root) %{_sbindir}/cherokee-admin
+%{_mandir}/man1/cherokee-admin.1*
+%dir %{_datadir}/cherokee/admin
+%{_datadir}/cherokee/admin/cherokee.conf.sample
+%{_datadir}/cherokee/admin/performance.conf.sample
+%{_datadir}/cherokee/admin/*.html
+%attr(755,root,root) %{_datadir}/cherokee/admin/*.py
+%{_datadir}/cherokee/admin/static
 
 %files libs
 %defattr(644,root,root,755)
