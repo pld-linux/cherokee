@@ -1,5 +1,5 @@
---- cherokee-0.99.29/cherokee.conf.sample.pre.orig	2009-11-15 16:24:35.000000000 +0100
-+++ cherokee-0.99.29/cherokee.conf.sample.pre	2009-11-28 02:04:28.000000000 +0100
+--- cherokee-0.99.44/cherokee.conf.sample.pre.orig	2010-03-20 14:41:48.000000000 +0100
++++ cherokee-0.99.44/cherokee.conf.sample.pre	2010-04-07 13:56:15.000000000 +0200
 @@ -11,6 +11,8 @@
  
  # Server
@@ -9,16 +9,17 @@
  server!bind!1!port = 80
  server!timeout = 15
  server!keepalive = 1
-@@ -27,10 +29,10 @@
+@@ -27,11 +29,11 @@
  
  vserver!1!logger = combined
  vserver!1!logger!access!type = file
 -vserver!1!logger!access!filename = %localstatedir%/log/cherokee.access
 +vserver!1!logger!access!filename = %localstatedir%/log/cherokee/cherokee.access
  vserver!1!logger!access!buffsize = 16384
- vserver!1!logger!error!type = file
--vserver!1!logger!error!filename = %localstatedir%/log/cherokee.error
-+vserver!1!logger!error!filename = %localstatedir%/log/cherokee/cherokee.error
+ 
+ vserver!1!error_writer!type = file
+-vserver!1!error_writer!filename = %localstatedir%/log/cherokee.error
++vserver!1!error_writer!filename = %localstatedir%/log/cherokee/cherokee.error
  
  vserver!1!rule!1!match = default
  vserver!1!rule!1!handler = common

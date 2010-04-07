@@ -1,12 +1,5 @@
 # TODO:
 # - does it requires spawn-fcgi?
-# - warning: Installed (but unpackaged) file(s) found:
-#   /usr/share/locale/de/LC_MESSAGES/cherokee.mo
-#   /usr/share/locale/en/LC_MESSAGES/cherokee.mo
-#   /usr/share/locale/es/LC_MESSAGES/cherokee.mo
-#   /usr/share/locale/nl/LC_MESSAGES/cherokee.mo
-#   /usr/share/locale/sv_SE/LC_MESSAGES/cherokee.mo
-#   /usr/share/locale/zh_CN/LC_MESSAGES/cherokee.mo
 #
 # Conditional build:
 %bcond_without	geoip		# without GeoIP support
@@ -14,12 +7,12 @@
 Summary:	Fast, Flexible and Lightweight Web server
 Summary(pl.UTF-8):	Cherokee - serwer WWW
 Name:		cherokee
-Version:	0.99.29
+Version:	0.99.44
 Release:	0.1
 License:	GPL v2
 Group:		Networking/Daemons
 Source0:	http://www.cherokee-project.com/download/0.99/%{version}/%{name}-%{version}.tar.gz
-# Source0-md5:	236f17981c0c8908f6911fda239fc3a4
+# Source0-md5:	268e7130c12b441523de963f95b9b85d
 Source1:	%{name}.init
 Source2:	%{name}.sysconfig
 Patch0:		%{name}-config.patch
@@ -144,6 +137,11 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/cherokee/lib*.la
 rm -rf html
 mv $RPM_BUILD_ROOT%{_docdir}/%{name} html
 
+# provided via %doc
+rm $RPM_BUILD_ROOT/etc/cherokee/cherokee.conf.perf_sample
+
+%find_lang %{name}
+
 %clean
 rm -rf $RPM_BUILD_ROOT
 
@@ -174,9 +172,9 @@ fi
 %post	libs -p /sbin/ldconfig
 %postun	libs -p /sbin/ldconfig
 
-%files
+%files -f %{name}.lang
 %defattr(644,root,root,755)
-%doc AUTHORS ChangeLog html contrib/*to*.py
+%doc AUTHORS ChangeLog html contrib/*to*.py performance.conf.sample
 %dir %attr(750,root,root) %{_sysconfdir}
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/cherokee.conf
 
@@ -211,7 +209,7 @@ fi
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_evhost.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_exists.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_extensions.so
-%attr(755,root,root) %{_libdir}/cherokee/libplugin_fastcgi.so
+#%attr(755,root,root) %{_libdir}/cherokee/libplugin_fastcgi.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_fcgi.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_file.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_from.so
@@ -231,6 +229,8 @@ fi
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_or.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_pam.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_plain.so
+%attr(755,root,root) %{_libdir}/cherokee/libplugin_post_report.so
+%attr(755,root,root) %{_libdir}/cherokee/libplugin_post_track.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_proxy.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_redir.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_rehost.so
@@ -244,6 +244,7 @@ fi
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_ssi.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_streaming.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_target_ip.so
+%attr(755,root,root) %{_libdir}/cherokee/libplugin_url_arg.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_uwsgi.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_wildcard.so
 
