@@ -1,6 +1,7 @@
+#
 # TODO:
-#   - does it requires spawn-fcgi?
-#   - move modules to subpackages. At least, those with extra dependencies.
+#   - think about moving modules to subpackages. At least, those with extra
+#     dependencies.
 #
 # Conditional build:
 %bcond_without	geoip		# without GeoIP support
@@ -12,7 +13,7 @@ Summary:	Fast, Flexible and Lightweight Web server
 Summary(pl.UTF-8):	Cherokee - serwer WWW
 Name:		cherokee
 Version:	0.99.44
-Release:	0.1
+Release:	1
 License:	GPL v2
 Group:		Networking/Daemons
 Source0:	http://www.cherokee-project.com/download/0.99/%{version}/%{name}-%{version}.tar.gz
