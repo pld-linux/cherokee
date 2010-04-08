@@ -162,6 +162,7 @@ mv $RPM_BUILD_ROOT%{_docdir}/%{name} html
 # provided via %doc
 rm $RPM_BUILD_ROOT/etc/cherokee/cherokee.conf.perf_sample
 
+mv $RPM_BUILD_ROOT%{_localedir}/{sv_SE,sv}
 %find_lang %{name}
 
 %clean
@@ -284,6 +285,10 @@ fi
 %config(missingok) %{_wwwroot}/*
 
 %dir %attr(750,cherokee,logs) /var/log/%{name}
+
+%dir %attr(771,root,cherokee) /var/lib/%{name}
+%dir %attr(771,cherokee,cherokee) /var/lib/%{name}/graphs
+%dir %attr(771,cherokee,cherokee) /var/lib/%{name}/graphs/images
 
 %files admin -f %{name}.lang
 %defattr(644,root,root,755)
