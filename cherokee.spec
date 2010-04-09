@@ -144,7 +144,7 @@ export PHPCGI=%{_bindir}/php.fcgi
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT{/etc/{pam.d,sysconfig,rc.d/init.d},/var/log/%{name}}
 
-%{__make} install \
+%{__make} -j1 install \
 	DESTDIR=$RPM_BUILD_ROOT
 
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/%{name}
