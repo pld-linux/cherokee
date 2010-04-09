@@ -23,6 +23,7 @@ Source2:	%{name}.sysconfig
 Patch0:		%{name}-config.patch
 Patch1:		%{name}-php-path.patch
 Patch2:		%{name}-panic_path.patch
+Patch3:		%{name}-methods.patch
 URL:		http://www.cherokee-project.com/
 %{?with_geoip:BuildRequires:	GeoIP-devel}
 BuildRequires:	autoconf
@@ -119,6 +120,7 @@ Biblioteki serwera WWW Cherokee.
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
+%patch3 -p1
 
 %build
 %{__libtoolize}

@@ -1,0 +1,69 @@
+--- cherokee-0.99.44/cherokee/header.c.orig	2010-03-20 14:48:22.000000000 +0100
++++ cherokee-0.99.44/cherokee/header.c	2010-04-09 11:01:11.000000000 +0200
+@@ -320,16 +320,28 @@
+ 		detect_method (line, "TRACE", trace)
+ 		break;
+ 	case 'C':
++		detect_method (line, "CHECKIN", checkin)
++		else
++		detect_method (line, "CHECKOUT", checkout)
++		else
+ 		detect_method (line, "CONNECT", connect)
+ 		else
+ 		detect_method (line, "COPY", copy)
+ 		break;
+ 	case 'L':
++		detect_method (line, "LABEL", label)
++	        break;
+ 		detect_method (line, "LOCK", lock)
+ 	        break;
+ 	case 'M':
++		detect_method (line, "MERGE", merge)
++		else
++		detect_method (line, "MKACTIVITY", mkactivity)
++		else
+ 		detect_method (line, "MKCOL", mkcol)
+ 		else
++		detect_method (line, "MKWORKSPACE", mkworkspace)
++		else
+ 		detect_method (line, "MOVE", move)
+ 	        break;
+ 	case 'N':
+@@ -341,6 +353,10 @@
+ 		detect_method (line, "SUBSCRIBE", subscribe)
+ 	        break;
+ 	case 'U':
++		detect_method (line, "UPDATE", update)
++		else
++		detect_method (line, "UNCHECKOUT", uncheckout)
++		else
+ 		detect_method (line, "UNLOCK", unlock)
+ 		else
+ 		detect_method (line, "UNSUBSCRIBE", unsubscribe)
+@@ -348,6 +364,15 @@
+ 	case 'R':
+ 		detect_method (line, "REPORT", report)
+ 	        break;
++	case 'V':
++		detect_method (line, "VERSION_CONTROL", version_control)
++	        break;
++	case 'B':
++		detect_method (line, "BASELINE_CONTROL", baseline_control)
++		break;
++	case 'I':
++		detect_method (line, "INVALID", invalid)
++		break;
+ 	}
+ 
+ 	return ret_error;
+--- cherokee-0.99.44/cherokee/http.h.orig	2010-03-20 14:41:49.000000000 +0100
++++ cherokee-0.99.44/cherokee/http.h	2010-04-09 11:14:38.000000000 +0200
+@@ -44,7 +44,7 @@
+ 
+ typedef enum {
+ 	http_unknown      = 0LL,
+-	http_all_methods  = 0xFFFFFFFLL,
++	http_all_methods  = 0x1FFFFFFFFLL,
+ 
+ 	http_get              = 1,
+ 	http_post             = 1LL << 1,
