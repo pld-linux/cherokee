@@ -2,6 +2,7 @@
 # TODO:
 #   - think about moving modules to subpackages. At least, those with extra
 #     dependencies.
+#   - maybe there is no need to pack *.py (are *.pyc enough?)
 #
 # Conditional build:
 %bcond_without	geoip		# without GeoIP support
@@ -12,18 +13,17 @@
 Summary:	Fast, Flexible and Lightweight Web server
 Summary(pl.UTF-8):	Cherokee - serwer WWW
 Name:		cherokee
-Version:	0.99.44
-Release:	3
+Version:	0.99.48
+Release:	1
 License:	GPL v2
 Group:		Networking/Daemons
 Source0:	http://www.cherokee-project.com/download/0.99/%{version}/%{name}-%{version}.tar.gz
-# Source0-md5:	268e7130c12b441523de963f95b9b85d
+# Source0-md5:	16f3769e99919648c82383281588ccb0
 Source1:	%{name}.init
 Source2:	%{name}.sysconfig
 Patch0:		%{name}-config.patch
 Patch1:		%{name}-php-path.patch
 Patch2:		%{name}-panic_path.patch
-Patch3:		%{name}-methods.patch
 URL:		http://www.cherokee-project.com/
 %{?with_geoip:BuildRequires:	GeoIP-devel}
 BuildRequires:	autoconf
@@ -120,7 +120,6 @@ Biblioteki serwera WWW Cherokee.
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
-%patch3 -p1
 
 %build
 %{__libtoolize}
@@ -165,8 +164,13 @@ mv $RPM_BUILD_ROOT%{_docdir}/%{name} html
 # provided via %doc
 rm $RPM_BUILD_ROOT/etc/cherokee/cherokee.conf.perf_sample
 
+# compile python modules, otherwise *.pyc may get generated on runtime
+# and stay after package removal
+%py_comp $RPM_BUILD_ROOT%{_datadir}/cherokee/admin/
+
 mv $RPM_BUILD_ROOT%{_localedir}/{sv_SE,sv}
 %find_lang %{name}
+
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -302,7 +306,19 @@ fi
 %{_datadir}/cherokee/admin/performance.conf.sample
 %{_datadir}/cherokee/admin/*.html
 %attr(755,root,root) %{_datadir}/cherokee/admin/*.py
+%{_datadir}/cherokee/admin/*.pyc
 %{_datadir}/cherokee/admin/static
+%dir %{_datadir}/cherokee/admin/CTK
+%dir %{_datadir}/cherokee/admin/CTK/CTK
+%{_datadir}/cherokee/admin/CTK/CTK/*.py
+%{_datadir}/cherokee/admin/CTK/CTK/*.pyc
+%{_datadir}/cherokee/admin/CTK/static
+%dir %{_datadir}/cherokee/admin/plugins
+%{_datadir}/cherokee/admin/plugins/*.py
+%{_datadir}/cherokee/admin/plugins/*.pyc
+%dir %{_datadir}/cherokee/admin/wizards
+%{_datadir}/cherokee/admin/wizards/*.py
+%{_datadir}/cherokee/admin/wizards/*.pyc
 
 %files libs
 %defattr(644,root,root,755)
