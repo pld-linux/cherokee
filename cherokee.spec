@@ -14,13 +14,14 @@ Summary:	Fast, Flexible and Lightweight Web server
 Summary(pl.UTF-8):	Cherokee - serwer WWW
 Name:		cherokee
 Version:	1.0.0
-Release:	1
+Release:	2
 License:	GPL v2
 Group:		Networking/Daemons
 Source0:	http://www.cherokee-project.com/download/1.0/%{version}/%{name}-%{version}.tar.gz
 # Source0-md5:	2287f647a0a6645347c525b3557f612c
 Source1:	%{name}.init
 Source2:	%{name}.sysconfig
+Source3:	%{name}.upstart
 Patch0:		%{name}-config.patch
 Patch1:		%{name}-php-path.patch
 Patch2:		%{name}-panic_path.patch
@@ -39,9 +40,9 @@ BuildRequires:	php-fcgi
 BuildRequires:	pkgconfig
 BuildRequires:	python-docutils
 BuildRequires:	rpm-pythonprov
-BuildRequires:	rpmbuild(macros) >= 1.268
+BuildRequires:	rpmbuild(macros) >= 1.561
 BuildRequires:	zlib-devel
-Requires(post,preun):	rc-scripts
+Requires(post,preun):	rc-scripts >= 0.4.3.2
 Requires(postun):	/usr/sbin/groupdel
 Requires(postun):	/usr/sbin/userdel
 Requires(pre):	/bin/id
@@ -77,6 +78,19 @@ Obsługuje konfigurację w locie poprzez odczyt plików lub łańcuchów
 znaków, TLS/SSL poprzez OpenSSL, hosty wirtualne, uwierzytelnianie,
 opcje związane z pamięcią podręczną, PHP, własne zarządzanie błędami i
 wiele więcej.
+
+%package upstart
+Summary:	Upstart job description for the Cherokee web server
+Summary(pl.UTF-8):	Opis zadania Upstart dla serwera Cherokee
+Group:		Daemons
+Requires:	%{name} = %{version}-%{release}
+Requires:	upstart >= 0.6
+
+%description upstart
+Upstart job description for the Cherokee web server.
+
+%description upstart -l pl.UTF-8
+Opis zadania Upstart dla serwera WWW Cherokee.
 
 %package admin
 Summary:	Cherokee web server administration interface
@@ -143,13 +157,14 @@ export PHPCGI=%{_bindir}/php.fcgi
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT{/etc/{pam.d,sysconfig,rc.d/init.d},/var/log/%{name}}
+install -d $RPM_BUILD_ROOT{/etc/{init,pam.d,sysconfig,rc.d/init.d},/var/log/%{name}}
 
 %{__make} -j1 install \
 	DESTDIR=$RPM_BUILD_ROOT
 
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/%{name}
 install %{SOURCE2} $RPM_BUILD_ROOT/etc/sysconfig/%{name}
+install %{SOURCE3} $RPM_BUILD_ROOT/etc/init/%{name}.conf
 
 # users don't need this
 mv $RPM_BUILD_ROOT{%{_bindir},%{_sbindir}}/cherokee-panic
@@ -198,6 +213,12 @@ if [ "$1" = "0" ]; then
 	%groupremove cherokee
 	%groupremove http
 fi
+
+%post upstart
+%upstart_post %{name}
+
+%postun upstart
+%upstart_postun %{name}
 
 %post	libs -p /sbin/ldconfig
 %postun	libs -p /sbin/ldconfig
@@ -296,6 +317,10 @@ fi
 %dir %attr(771,root,cherokee) /var/lib/%{name}
 %dir %attr(771,cherokee,cherokee) /var/lib/%{name}/graphs
 %dir %attr(771,cherokee,cherokee) /var/lib/%{name}/graphs/images
+
+%files upstart
+%defattr(644,root,root,755)
+%config(noreplace) %verify(not md5 mtime size) /etc/init/%{name}.conf
 
 %files admin -f %{name}.lang
 %defattr(644,root,root,755)

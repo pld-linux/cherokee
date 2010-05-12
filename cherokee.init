@@ -42,11 +42,13 @@ configtest() {
 start() {
 	# Check if the service is already running?
 	if [ ! -f /var/lock/subsys/cherokee ]; then
+		emit starting JOB=cherokee SERVICE=web-server
 		msg_starting "Cherokee Web Server"
 		daemon cherokee -d
 		RETVAL=$?
 		if [ $RETVAL -eq 0 ]; then
 			touch /var/lock/subsys/cherokee
+			emit --no-wait started JOB=cherokee SERVICE=web-server
 		fi
 	else
 		msg_already_running "Cherokee Web Server"
@@ -56,10 +58,12 @@ start() {
 stop() {
 	if [ -f /var/lock/subsys/cherokee ]; then
 		# Stop daemons.
+		emit stopping JOB=cherokee SERVICE=web-server
 		msg_stopping "Cherokee Web Server"
 		killproc cherokee
 		RETVAL=$?
 		rm -f /var/lock/subsys/cherokee >/dev/null 2>&1
+		emit --no-wait stopped JOB=cherokee SERVICE=web-server
 	else
 		msg_not_running "Cherokee Web Server"
 	fi
@@ -103,6 +107,8 @@ reload() {
 		RETVAL=7
 	fi
 }
+
+upstart_controlled --except configtest
 
 RETVAL=0
 # See how we were called.

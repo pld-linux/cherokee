@@ -1,0 +1,16 @@
+
+start on pld.network-started and started SERVICE=syslog and started random
+stop on pld.shutdown-started
+
+env SERVICE=web-server
+export SERVICE
+
+respawn
+
+console output
+
+script
+	exec /usr/sbin/cherokee
+end script
+
+# vi: ft=upstart
