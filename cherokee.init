@@ -27,22 +27,26 @@ else
 	exit 0
 fi
 
+configtest() {
+	
+	test_result="$(/usr/sbin/cherokee -t 2>&1)"
+	# exit status is not usable here, parse the output
+	if [ "${test_result##Test on*: }" = "OK" ] ; then
+		return 0
+	else
+		echo $test_result >&2
+		return 1
+	fi
+}
+
 start() {
 	# Check if the service is already running?
 	if [ ! -f /var/lock/subsys/cherokee ]; then
 		msg_starting "Cherokee Web Server"
-		(
-		# it offers no stdout/stderr logging. workaround
-		exec 2>>/var/log/cherokee/cherokee.log
-		exec 1>&2
-		start-stop-daemon --start --pidfile /var/run/cherokee.pid --oknodo -b --exec /usr/sbin/cherokee
-		)
+		daemon cherokee -d
 		RETVAL=$?
 		if [ $RETVAL -eq 0 ]; then
 			touch /var/lock/subsys/cherokee
-			ok
-		else
-			fail
 		fi
 	else
 		msg_already_running "Cherokee Web Server"
@@ -53,14 +57,9 @@ stop() {
 	if [ -f /var/lock/subsys/cherokee ]; then
 		# Stop daemons.
 		msg_stopping "Cherokee Web Server"
-		start-stop-daemon --stop --pidfile /var/run/cherokee.pid --oknodo --exec /usr/sbin/cherokee
+		killproc cherokee
 		RETVAL=$?
-		if [ $RETVAL -eq 0 ]; then
-			rm -f /var/lock/subsys/cherokee >/dev/null 2>&1
-			ok
-		else
-			fail
-		fi
+		rm -f /var/lock/subsys/cherokee >/dev/null 2>&1
 	else
 		msg_not_running "Cherokee Web Server"
 	fi
@@ -68,11 +67,40 @@ stop() {
 
 condrestart() {
 	if [ -f /var/lock/subsys/cherokee ]; then
-		stop
-		start
+		if configtest ; then
+			stop
+			start
+		else
+			RETVAL=1
+		fi
 	else
 		msg_not_running "Cherokee Web Server"
 		RETVAL=$1
+	fi
+}
+
+reload() {
+	if [ -f /var/lock/subsys/cherokee ]; then
+		if configtest ; then
+			msg_reloading "Cherokee Web Server"
+			pid="$(pidofproc cherokee)"
+			if [ -n "$pid" ] && kill -HUP $(pidofproc cherokee) ; then
+				ok
+			elif [ "$1" = "force-reload" ] ; then
+				fail
+				stop
+				start
+				RETVAL=$?
+			else
+				fail
+				RETVAL=1
+			fi
+		else
+			RETVAL=1
+		fi
+	else
+		msg_not_running "Cherokee Web Server"
+		RETVAL=7
 	fi
 }
 
@@ -86,21 +114,27 @@ case "$1" in
   	stop
 	;;
   restart)
-	stop
-	start
+	if configtest ; then
+		stop
+		start
+	fi
+	;;
+  reload|force-reload)
+        reload $1
 	;;
   try-restart)
 	condrestart 0
-	;;
-  force-reload)
-	condrestart 7
 	;;
   status)
 	status cherokee
 	RETVAL=$?
 	;;
+  configtest)
+  	configtest
+	RETVAL=$?
+	;;
   *)
-	msg_usage "$0 {start|stop|restart|try-restart|force-reload|status}"
+	msg_usage "$0 {start|stop|restart|try-restart|force-reload|status|configtest}"
 	exit 3
 esac
 
