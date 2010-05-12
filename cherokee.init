@@ -27,9 +27,11 @@ else
 	exit 0
 fi
 
+# configtest itself
+# must return non-zero if check failed
+# output is discarded if checkconfig is ran without details
 configtest() {
-	
-	test_result="$(/usr/sbin/cherokee -t 2>&1)"
+	local test_result="$(/usr/sbin/cherokee -t 2>&1)"
 	# exit status is not usable here, parse the output
 	if [ "${test_result##Test on*: }" = "OK" ] ; then
 		return 0
@@ -39,72 +41,100 @@ configtest() {
 	fi
 }
 
+# wrapper for configtest
+# with $details = 1 will report ok/fail status to output (status action)
+# with $detauls = 0 will silently discard ok output, and with fail exit script with failure
+checkconfig() {
+	local details=${1:-0}
+
+	if [ $details = 1 ]; then
+		# run config test and display report (status action)
+		show "Checking %s configuration" "Cherokee Web Server"; busy
+		local out
+		out=$(configtest 2>&1)
+		RETVAL=$?
+		if [ $RETVAL = 0 ]; then
+			ok
+		else
+			fail
+		fi
+		[ "$out" ] && echo >&2 "$out"
+	else
+		# run config test and abort with nice message if failed
+		# (for actions checking status before action).
+		configtest >/dev/null 2>&1
+		RETVAL=$?
+		if [ $RETVAL != 0 ]; then
+			show "Checking %s configuration" "Cherokee Web Server"; fail
+			nls 'Configuration test failed. See details with %s "checkconfig"' $0
+			exit $RETVAL
+		fi
+	fi
+}
+
 start() {
 	# Check if the service is already running?
-	if [ ! -f /var/lock/subsys/cherokee ]; then
-		emit starting JOB=cherokee SERVICE=web-server
-		msg_starting "Cherokee Web Server"
-		daemon cherokee -d
-		RETVAL=$?
-		if [ $RETVAL -eq 0 ]; then
-			touch /var/lock/subsys/cherokee
-			emit --no-wait started JOB=cherokee SERVICE=web-server
-		fi
-	else
+	if [ -f /var/lock/subsys/cherokee ]; then
 		msg_already_running "Cherokee Web Server"
+		return
+	fi
+
+	emit starting JOB=cherokee SERVICE=web-server
+	msg_starting "Cherokee Web Server"
+	daemon cherokee -d
+	RETVAL=$?
+	if [ $RETVAL -eq 0 ]; then
+		touch /var/lock/subsys/cherokee
+		emit --no-wait started JOB=cherokee SERVICE=web-server
 	fi
 }
 
 stop() {
-	if [ -f /var/lock/subsys/cherokee ]; then
-		# Stop daemons.
-		emit stopping JOB=cherokee SERVICE=web-server
-		msg_stopping "Cherokee Web Server"
-		killproc cherokee
-		RETVAL=$?
-		rm -f /var/lock/subsys/cherokee >/dev/null 2>&1
-		emit --no-wait stopped JOB=cherokee SERVICE=web-server
-	else
+	if [ ! -f /var/lock/subsys/cherokee ]; then
 		msg_not_running "Cherokee Web Server"
+		return
 	fi
+
+	# Stop daemons.
+	emit stopping JOB=cherokee SERVICE=web-server
+	msg_stopping "Cherokee Web Server"
+	killproc cherokee
+	RETVAL=$?
+	rm -f /var/lock/subsys/cherokee >/dev/null 2>&1
+	emit --no-wait stopped JOB=cherokee SERVICE=web-server
 }
 
 condrestart() {
-	if [ -f /var/lock/subsys/cherokee ]; then
-		if configtest ; then
-			stop
-			start
-		else
-			RETVAL=1
-		fi
-	else
+	if [ ! -f /var/lock/subsys/cherokee ]; then
 		msg_not_running "Cherokee Web Server"
 		RETVAL=$1
+		return
 	fi
+
+	checkconfig
+	stop
+	start
 }
 
 reload() {
-	if [ -f /var/lock/subsys/cherokee ]; then
-		if configtest ; then
-			msg_reloading "Cherokee Web Server"
-			pid="$(pidofproc cherokee)"
-			if [ -n "$pid" ] && kill -HUP $(pidofproc cherokee) ; then
-				ok
-			elif [ "$1" = "force-reload" ] ; then
-				fail
-				stop
-				start
-				RETVAL=$?
-			else
-				fail
-				RETVAL=1
-			fi
-		else
-			RETVAL=1
-		fi
-	else
+	if [ ! -f /var/lock/subsys/cherokee ]; then
 		msg_not_running "Cherokee Web Server"
 		RETVAL=7
+	fi
+
+	checkconfig
+	msg_reloading "Cherokee Web Server"
+	pid="$(pidofproc cherokee)"
+	if [ -n "$pid" ] && kill -HUP $(pidofproc cherokee); then
+		ok
+	elif [ "$1" = "force-reload" ] ; then
+		fail
+		stop
+		start
+		RETVAL=$?
+	else
+		fail
+		RETVAL=1
 	fi
 }
 
@@ -114,33 +144,32 @@ RETVAL=0
 # See how we were called.
 case "$1" in
   start)
-  	start
+	start
 	;;
   stop)
-  	stop
+	stop
 	;;
   restart)
-	if configtest ; then
-		stop
-		start
-	fi
+	checkconfig
+	stop
+	start
 	;;
   reload|force-reload)
-        reload $1
+	reload $1
 	;;
   try-restart)
 	condrestart 0
+	;;
+  checkconfig|configtest)
+  	checkconfig 1
+	RETVAL=$?
 	;;
   status)
 	status cherokee
 	RETVAL=$?
 	;;
-  configtest)
-  	configtest
-	RETVAL=$?
-	;;
   *)
-	msg_usage "$0 {start|stop|restart|try-restart|force-reload|status|configtest}"
+	msg_usage "$0 {start|stop|restart|try-restart|force-reload|configtest|status}"
 	exit 3
 esac
 
