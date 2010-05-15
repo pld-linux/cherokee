@@ -30,6 +30,7 @@ URL:		http://www.cherokee-project.com/
 BuildRequires:	autoconf
 BuildRequires:	automake
 %{?with_ffmpeg:BuildRequires:	ffmpeg-devel}
+BuildRequires:	gettext-devel
 BuildRequires:	libtool
 %{?with_mysql:BuildRequires:	mysql-devel}
 %{?with_ldap:BuildRequires:	openldap-devel}
@@ -50,8 +51,8 @@ Requires(pre):	/usr/bin/getgid
 Requires(pre):	/usr/sbin/groupadd
 Requires(pre):	/usr/sbin/useradd
 Requires:	%{name}-libs = %{version}-%{release}
-Suggests:	php-fcgi
 Suggests:	%{name}-admin = %{version}-%{release}
+Suggests:	php-fcgi
 Provides:	group(cherokee)
 Provides:	group(http)
 Provides:	user(cherokee)
@@ -96,9 +97,9 @@ Opis zadania Upstart dla serwera WWW Cherokee.
 Summary:	Cherokee web server administration interface
 Summary(pl.UTF-8):	Interfejs administracyjny serwera WWW Cherokee
 Group:		Networking/Daemons
+Requires:	%{name} = %{version}-%{release}
 Requires:	python
 Requires:	python-modules
-Requires:	%{name} = %{version}-%{release}
 
 %description admin
 Cherokee web server administration interface.
