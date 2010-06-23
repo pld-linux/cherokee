@@ -37,7 +37,7 @@ BuildRequires:	libtool
 BuildRequires:	openssl-devel
 BuildRequires:	pam-devel
 BuildRequires:	pcre-devel
-BuildRequires:	php-fcgi
+BuildRequires:	php(fcgi)
 BuildRequires:	pkgconfig
 BuildRequires:	python-docutils
 BuildRequires:	rpm-pythonprov
@@ -52,7 +52,7 @@ Requires(pre):	/usr/sbin/groupadd
 Requires(pre):	/usr/sbin/useradd
 Requires:	%{name}-libs = %{version}-%{release}
 Suggests:	%{name}-admin = %{version}-%{release}
-Suggests:	php-fcgi
+Suggests:	php(fcgi)
 Provides:	group(cherokee)
 Provides:	group(http)
 Provides:	user(cherokee)
