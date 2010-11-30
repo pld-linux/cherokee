@@ -13,12 +13,12 @@
 Summary:	Fast, Flexible and Lightweight Web server
 Summary(pl.UTF-8):	Cherokee - serwer WWW
 Name:		cherokee
-Version:	1.0.8
+Version:	1.0.10
 Release:	1
 License:	GPL v2
 Group:		Networking/Daemons
 Source0:	http://www.cherokee-project.com/download/1.0/%{version}/%{name}-%{version}.tar.gz
-# Source0-md5:	12117a80c2a970173bd32660439c2db0
+# Source0-md5:	bca6dc0ec3eedd1c6e35bce5885bacdc
 Source1:	%{name}.init
 Source2:	%{name}.sysconfig
 Source3:	%{name}.upstart
@@ -226,7 +226,7 @@ fi
 
 %files
 %defattr(644,root,root,755)
-%doc AUTHORS ChangeLog html contrib/*to*.py performance.conf.sample
+%doc AUTHORS ChangeLog html performance.conf.sample
 %dir %attr(750,root,root) %{_sysconfdir}
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/cherokee.conf
 
@@ -234,6 +234,7 @@ fi
 %config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/cherokee
 %attr(754,root,root) /etc/rc.d/init.d/cherokee
 
+%attr(755,root,root) %{_bindir}/CTK-run
 %attr(755,root,root) %{_bindir}/cget
 %attr(755,root,root) %{_bindir}/cherokee-tweak
 %attr(755,root,root) %{_sbindir}/cherokee
@@ -298,6 +299,7 @@ fi
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_tls.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_url_arg.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_uwsgi.so
+%attr(755,root,root) %{_libdir}/cherokee/libplugin_v_or.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_wildcard.so
 
 %{_mandir}/man1/cget.1*
@@ -346,6 +348,9 @@ fi
 %dir %{_datadir}/cherokee/admin/wizards
 %{_datadir}/cherokee/admin/wizards/*.py
 %{_datadir}/cherokee/admin/wizards/*.pyc
+%dir %{_datadir}/cherokee/admin/market
+%{_datadir}/cherokee/admin/market/*.py
+%{_datadir}/cherokee/admin/market/*.pyc
 
 %files libs
 %defattr(644,root,root,755)
@@ -353,8 +358,6 @@ fi
 %attr(755,root,root) %ghost %{_libdir}/libcherokee-base.so.0
 %attr(755,root,root) %{_libdir}/libcherokee-client.so.*.*.*
 %attr(755,root,root) %ghost %{_libdir}/libcherokee-client.so.0
-%attr(755,root,root) %{_libdir}/libcherokee-config.so.*.*.*
-%attr(755,root,root) %ghost %{_libdir}/libcherokee-config.so.0
 %attr(755,root,root) %{_libdir}/libcherokee-server.so.*.*.*
 %attr(755,root,root) %ghost %{_libdir}/libcherokee-server.so.0
 
@@ -363,11 +366,9 @@ fi
 %attr(755,root,root) %{_bindir}/cherokee-config
 %attr(755,root,root) %{_libdir}/libcherokee-base.so
 %attr(755,root,root) %{_libdir}/libcherokee-client.so
-%attr(755,root,root) %{_libdir}/libcherokee-config.so
 %attr(755,root,root) %{_libdir}/libcherokee-server.so
 %{_libdir}/libcherokee-base.la
 %{_libdir}/libcherokee-client.la
-%{_libdir}/libcherokee-config.la
 %{_libdir}/libcherokee-server.la
 %{_includedir}/cherokee
 %{_pkgconfigdir}/cherokee.pc

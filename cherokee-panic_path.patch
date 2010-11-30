@@ -9,14 +9,14 @@
  server!pid_file = %localstatedir%/run/cherokee.pid
  
  # Default virtual server
---- cherokee-0.9.4/admin/configured.py.pre.orig	2008-09-26 23:29:35.000000000 +0200
-+++ cherokee-0.9.4/admin/configured.py.pre	2008-10-21 20:37:10.000000000 +0200
-@@ -14,7 +14,7 @@
- CHEROKEE_ADMINDIR   = join (PREFIX, "share/cherokee/admin")
- CHEROKEE_ICONSDIR   = join (PREFIX, "share/cherokee/icons")
- CHEROKEE_THEMEDIR   = join (PREFIX, "share/cherokee/themes")
--CHEROKEE_PANIC_PATH = join (PREFIX, "bin/cherokee-panic")
-+CHEROKEE_PANIC_PATH = join (PREFIX, "sbin/cherokee-panic")
- CHEROKEE_PLUGINDIR  = join (LIBDIR, "cherokee")
- CHEROKEE_DATADIR    = join (DATADIR, "cherokee")
- CHEROKEE_DEPSDIR    = join (DATADIR, "cherokee/deps")
+--- cherokee-1.0.10/admin/configured.py.pre.orig	2010-10-28 11:42:31.000000000 +0200
++++ cherokee-1.0.10/admin/configured.py.pre	2010-11-30 18:36:22.000000000 +0100
+@@ -17,7 +17,7 @@
+ CHEROKEE_ADMINDIR     = join (PREFIX, "share/cherokee/admin")
+ CHEROKEE_ICONSDIR     = join (PREFIX, "share/cherokee/icons")
+ CHEROKEE_THEMEDIR     = join (PREFIX, "share/cherokee/themes")
+-CHEROKEE_PANIC_PATH   = join (PREFIX, "bin/cherokee-panic")
++CHEROKEE_PANIC_PATH   = join (PREFIX, "sbin/cherokee-panic")
+ CHEROKEE_PLUGINDIR    = join (LIBDIR, "cherokee")
+ CHEROKEE_DATADIR      = join (DATADIR, "cherokee")
+ CHEROKEE_DEPSDIR      = join (DATADIR, "cherokee/deps")
