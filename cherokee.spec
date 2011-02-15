@@ -13,18 +13,17 @@
 Summary:	Fast, Flexible and Lightweight Web server
 Summary(pl.UTF-8):	Cherokee - serwer WWW
 Name:		cherokee
-Version:	1.0.10
+Version:	1.0.20
 Release:	1
 License:	GPL v2
 Group:		Networking/Daemons
 Source0:	http://www.cherokee-project.com/download/1.0/%{version}/%{name}-%{version}.tar.gz
-# Source0-md5:	bca6dc0ec3eedd1c6e35bce5885bacdc
+# Source0-md5:	316afcbb44ef292691cd9e257ee0eeb3
 Source1:	%{name}.init
 Source2:	%{name}.sysconfig
 Source3:	%{name}.upstart
 Patch0:		%{name}-config.patch
-Patch1:		%{name}-php-path.patch
-Patch2:		%{name}-panic_path.patch
+Patch1:		%{name}-panic_path.patch
 URL:		http://www.cherokee-project.com/
 %{?with_geoip:BuildRequires:	GeoIP-devel}
 BuildRequires:	autoconf
@@ -134,7 +133,6 @@ Biblioteki serwera WWW Cherokee.
 %setup -q
 %patch0 -p1
 %patch1 -p1
-%patch2 -p1
 
 %build
 %{__libtoolize}
@@ -142,8 +140,8 @@ Biblioteki serwera WWW Cherokee.
 %{__autoconf}
 %{__autoheader}
 %{__automake}
-export PHPCGI=%{_bindir}/php.fcgi
 %configure \
+	--with-php=/usr/bin/php.cgi \
 	--disable-static \
 	--enable-os-string="PLD Linux" \
 	--sysconfdir=/etc \
@@ -183,6 +181,9 @@ rm $RPM_BUILD_ROOT/etc/cherokee/cherokee.conf.perf_sample
 # compile python modules, otherwise *.pyc may get generated on runtime
 # and stay after package removal
 %py_comp $RPM_BUILD_ROOT%{_datadir}/cherokee/admin/
+
+# seems like this is not needed on Linux
+rm $RPM_BUILD_ROOT%{_bindir}/cherokee-macos-askpass
 
 mv $RPM_BUILD_ROOT%{_localedir}/{sv_SE,sv}
 %find_lang %{name}
@@ -261,7 +262,7 @@ fi
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_evhost.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_exists.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_extensions.so
-#%attr(755,root,root) %{_libdir}/cherokee/libplugin_fastcgi.so
+%attr(755,root,root) %{_libdir}/cherokee/libplugin_failover.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_fcgi.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_file.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_from.so
@@ -329,7 +330,9 @@ fi
 %files admin -f %{name}.lang
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_sbindir}/cherokee-admin
+%attr(755,root,root) %{_bindir}/cherokee-admin-launcher
 %{_mandir}/man1/cherokee-admin.1*
+%{_mandir}/man1/cherokee-admin-launcher.1*
 %dir %{_datadir}/cherokee/admin
 %{_datadir}/cherokee/admin/cherokee.conf.sample
 %{_datadir}/cherokee/admin/performance.conf.sample
@@ -351,6 +354,9 @@ fi
 %dir %{_datadir}/cherokee/admin/market
 %{_datadir}/cherokee/admin/market/*.py
 %{_datadir}/cherokee/admin/market/*.pyc
+%dir %{_datadir}/cherokee/admin/icons
+%{_datadir}/cherokee/admin/icons/*.png
+%{_datadir}/cherokee/admin/icons/*.svg
 
 %files libs
 %defattr(644,root,root,755)
