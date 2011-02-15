@@ -295,7 +295,9 @@ fi
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_secdownload.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_server_info.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_ssi.so
+%if %{with ffmpeg}
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_streaming.so
+%endif
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_target_ip.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_tls.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_url_arg.so
