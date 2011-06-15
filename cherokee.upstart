@@ -2,8 +2,8 @@
 start on pld.network-started and started random
 stop on pld.shutdown-started
 
-env SERVICE=web-server
-export SERVICE
+env SERVICE_web_server=y
+export SERVICE_web_server
 
 respawn
 
