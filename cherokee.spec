@@ -13,12 +13,12 @@
 Summary:	Fast, Flexible and Lightweight Web server
 Summary(pl.UTF-8):	Cherokee - serwer WWW
 Name:		cherokee
-Version:	1.0.20
-Release:	2
+Version:	1.2.98
+Release:	1
 License:	GPL v2
 Group:		Networking/Daemons
-Source0:	http://www.cherokee-project.com/download/1.0/%{version}/%{name}-%{version}.tar.gz
-# Source0-md5:	316afcbb44ef292691cd9e257ee0eeb3
+Source0:	http://www.cherokee-project.com/download/1.2/%{version}/%{name}-%{version}.tar.gz
+# Source0-md5:	21b01e7d45c0e82ecc0c4257a9c27feb
 Source1:	%{name}.init
 Source2:	%{name}.sysconfig
 Source3:	%{name}.upstart
@@ -256,6 +256,7 @@ fi
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_deflate.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_directory.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_dirlist.so
+%attr(755,root,root) %{_libdir}/cherokee/libplugin_drop.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_empty_gif.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_error_nn.so
 %attr(755,root,root) %{_libdir}/cherokee/libplugin_error_redir.so
