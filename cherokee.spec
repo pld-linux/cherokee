@@ -14,7 +14,7 @@ Summary:	Fast, Flexible and Lightweight Web server
 Summary(pl.UTF-8):	Cherokee - serwer WWW
 Name:		cherokee
 Version:	1.2.98
-Release:	1
+Release:	2
 License:	GPL v2
 Group:		Networking/Daemons
 Source0:	http://www.cherokee-project.com/download/1.2/%{version}/%{name}-%{version}.tar.gz
@@ -56,6 +56,7 @@ Provides:	group(cherokee)
 Provides:	group(http)
 Provides:	user(cherokee)
 Provides:	webserver
+Provides:	webserver(indexfile)
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define		_sysconfdir	/etc/cherokee
