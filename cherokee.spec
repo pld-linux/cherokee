@@ -42,7 +42,7 @@ BuildRequires:	python-docutils
 BuildRequires:	rpm-pythonprov
 BuildRequires:	rpmbuild(macros) >= 1.561
 BuildRequires:	zlib-devel
-Requires(post,preun):	rc-scripts >= 0.4.3.2
+Requires(post,preun):	/sbin/chkconfig
 Requires(postun):	/usr/sbin/groupdel
 Requires(postun):	/usr/sbin/userdel
 Requires(pre):	/bin/id
@@ -50,6 +50,7 @@ Requires(pre):	/usr/bin/getgid
 Requires(pre):	/usr/sbin/groupadd
 Requires(pre):	/usr/sbin/useradd
 Requires:	%{name}-libs = %{version}-%{release}
+Requires:	rc-scripts >= 0.4.3.0
 Suggests:	%{name}-admin = %{version}-%{release}
 Suggests:	php(fcgi)
 Provides:	group(cherokee)
