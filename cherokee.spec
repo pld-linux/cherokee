@@ -14,7 +14,7 @@ Summary:	Fast, Flexible and Lightweight Web server
 Summary(pl.UTF-8):	Cherokee - serwer WWW
 Name:		cherokee
 Version:	1.2.101
-Release:	1
+Release:	2
 License:	GPL v2
 Group:		Networking/Daemons
 Source0:	http://www.cherokee-project.com/download/1.2/%{version}/%{name}-%{version}.tar.gz
@@ -24,11 +24,12 @@ Source2:	%{name}.sysconfig
 Source3:	%{name}.upstart
 Patch0:		%{name}-config.patch
 Patch1:		%{name}-panic_path.patch
+Patch2:		ffmpeg0.11.patch
 URL:		http://www.cherokee-project.com/
 %{?with_geoip:BuildRequires:	GeoIP-devel}
 BuildRequires:	autoconf
 BuildRequires:	automake
-%{?with_ffmpeg:BuildRequires:	ffmpeg-devel}
+%{?with_ffmpeg:BuildRequires:	ffmpeg-devel >= 1.0}
 BuildRequires:	gettext-devel
 BuildRequires:	libtool
 %{?with_mysql:BuildRequires:	mysql-devel}
@@ -135,6 +136,7 @@ Biblioteki serwera WWW Cherokee.
 %setup -q
 %patch0 -p1
 %patch1 -p1
+%patch2 -p1
 
 %build
 %{__libtoolize}
