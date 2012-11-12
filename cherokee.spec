@@ -14,7 +14,7 @@ Summary:	Fast, Flexible and Lightweight Web server
 Summary(pl.UTF-8):	Cherokee - serwer WWW
 Name:		cherokee
 Version:	1.2.101
-Release:	2
+Release:	3
 License:	GPL v2
 Group:		Networking/Daemons
 Source0:	http://www.cherokee-project.com/download/1.2/%{version}/%{name}-%{version}.tar.gz
@@ -190,6 +190,7 @@ rm $RPM_BUILD_ROOT/etc/cherokee/cherokee.conf.perf_sample
 rm $RPM_BUILD_ROOT%{_bindir}/cherokee-macos-askpass
 
 mv $RPM_BUILD_ROOT%{_localedir}/{sv_SE,sv}
+mv $RPM_BUILD_ROOT%{_localedir}/{jp,ja}
 %find_lang %{name}
 
 
