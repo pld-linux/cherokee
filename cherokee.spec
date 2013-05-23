@@ -13,15 +13,18 @@
 Summary:	Fast, Flexible and Lightweight Web server
 Summary(pl.UTF-8):	Cherokee - serwer WWW
 Name:		cherokee
-Version:	1.2.101
-Release:	3
+Version:	1.2.103
+Release:	1
 License:	GPL v2
 Group:		Networking/Daemons
-Source0:	http://www.cherokee-project.com/download/1.2/%{version}/%{name}-%{version}.tar.gz
-# Source0-md5:	ef47003355a2e368e4d9596cd070ef23
-Source1:	%{name}.init
-Source2:	%{name}.sysconfig
-Source3:	%{name}.upstart
+Source0:	https://github.com/cherokee/webserver/archive/v%{version}.zip
+# Source0-md5:	9e6d8e0dd95808d365d32ecb0a9b80fe
+# the last snapshot from https://github.com/cherokee/CTK
+Source1:	CTK-20120806.tar.xz
+# Source1-md5:	567f087cd6cdf10b89047535cbe94f8e
+Source2:	%{name}.init
+Source3:	%{name}.sysconfig
+Source4:	%{name}.upstart
 Patch0:		%{name}-config.patch
 Patch1:		%{name}-panic_path.patch
 Patch2:		ffmpeg0.11.patch
@@ -133,10 +136,10 @@ Cherokee web server libraries.
 Biblioteki serwera WWW Cherokee.
 
 %prep
-%setup -q
+%setup -qn webserver-%{version} -a1
 %patch0 -p1
 %patch1 -p1
-%patch2 -p1
+#%patch2 -p1
 
 %build
 %{__libtoolize}
@@ -144,6 +147,7 @@ Biblioteki serwera WWW Cherokee.
 %{__autoconf}
 %{__autoheader}
 %{__automake}
+po/admin/generate_POTFILESin.py > po/admin/POTFILES.in
 %configure \
 	--with-php=/usr/bin/php.cgi \
 	--disable-static \
@@ -156,6 +160,11 @@ Biblioteki serwera WWW Cherokee.
 	%{!?with_mysql:--without-mysql} \
 	%{!?with_ffmpeg:--without-ffmpeg} \
 	%{!?with_ldap:--without-ldap}
+
+# workaround for missing pot file and no way to build it
+touch po/admin/cherokee.pot
+touch po/admin/*.po
+
 %{__make}
 
 %install
@@ -165,9 +174,9 @@ install -d $RPM_BUILD_ROOT{/etc/{init,pam.d,sysconfig,rc.d/init.d},/var/log/%{na
 %{__make} -j1 install \
 	DESTDIR=$RPM_BUILD_ROOT
 
-install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/%{name}
-install %{SOURCE2} $RPM_BUILD_ROOT/etc/sysconfig/%{name}
-install %{SOURCE3} $RPM_BUILD_ROOT/etc/init/%{name}.conf
+install %{SOURCE2} $RPM_BUILD_ROOT/etc/rc.d/init.d/%{name}
+install %{SOURCE3} $RPM_BUILD_ROOT/etc/sysconfig/%{name}
+install %{SOURCE4} $RPM_BUILD_ROOT/etc/init/%{name}.conf
 
 # users don't need this
 mv $RPM_BUILD_ROOT{%{_bindir},%{_sbindir}}/cherokee-panic
@@ -204,9 +213,11 @@ rm -rf $RPM_BUILD_ROOT
 %addusertogroup cherokee http
 
 %post
+if [ "$1" = "2" -a -e %{_sysconfdir}/cherokee.conf ]; then
+	%{_datadir}/%{name}/admin/upgrade_config.py %{_sysconfdir}/cherokee.conf
+fi
 /sbin/chkconfig --add %{name}
 %service %{name} restart "Cherokee webserver"
-exit 0
 
 %preun
 if [ "$1" = "0" ]; then
@@ -232,7 +243,7 @@ fi
 
 %files
 %defattr(644,root,root,755)
-%doc AUTHORS ChangeLog html performance.conf.sample
+%doc AUTHORS html performance.conf.sample
 %dir %attr(750,root,root) %{_sysconfdir}
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/cherokee.conf
 
@@ -359,9 +370,9 @@ fi
 %dir %{_datadir}/cherokee/admin/wizards
 %{_datadir}/cherokee/admin/wizards/*.py
 %{_datadir}/cherokee/admin/wizards/*.pyc
-%dir %{_datadir}/cherokee/admin/market
-%{_datadir}/cherokee/admin/market/*.py
-%{_datadir}/cherokee/admin/market/*.pyc
+#%dir %{_datadir}/cherokee/admin/market
+#%{_datadir}/cherokee/admin/market/*.py
+#%{_datadir}/cherokee/admin/market/*.pyc
 %dir %{_datadir}/cherokee/admin/icons
 %{_datadir}/cherokee/admin/icons/*.png
 %{_datadir}/cherokee/admin/icons/*.svg
