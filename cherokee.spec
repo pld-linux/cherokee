@@ -25,6 +25,7 @@ Source1:	CTK-20120806.tar.xz
 Source2:	%{name}.init
 Source3:	%{name}.sysconfig
 Source4:	%{name}.upstart
+Source5:	%{name}.service
 Patch0:		%{name}-config.patch
 Patch1:		%{name}-panic_path.patch
 Patch2:		ffmpeg0.11.patch
@@ -44,7 +45,7 @@ BuildRequires:	php(fcgi)
 BuildRequires:	pkgconfig
 BuildRequires:	python-docutils
 BuildRequires:	rpm-pythonprov
-BuildRequires:	rpmbuild(macros) >= 1.561
+BuildRequires:	rpmbuild(macros) >= 1.647
 BuildRequires:	zlib-devel
 Requires(post,preun):	/sbin/chkconfig
 Requires(postun):	/usr/sbin/groupdel
@@ -55,6 +56,7 @@ Requires(pre):	/usr/sbin/groupadd
 Requires(pre):	/usr/sbin/useradd
 Requires:	%{name}-libs = %{version}-%{release}
 Requires:	rc-scripts >= 0.4.3.0
+Requires:	systemd-units >= 38
 Suggests:	%{name}-admin = %{version}-%{release}
 Suggests:	php(fcgi)
 Provides:	group(cherokee)
@@ -169,7 +171,9 @@ touch po/admin/*.po
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT{/etc/{init,pam.d,sysconfig,rc.d/init.d},/var/log/%{name}}
+install -d $RPM_BUILD_ROOT/etc/{init,pam.d,sysconfig,rc.d/init.d} \
+		$RPM_BUILD_ROOT/var/log/%{name} \
+		$RPM_BUILD_ROOT%{systemdunitdir}
 
 %{__make} -j1 install \
 	DESTDIR=$RPM_BUILD_ROOT
@@ -177,6 +181,7 @@ install -d $RPM_BUILD_ROOT{/etc/{init,pam.d,sysconfig,rc.d/init.d},/var/log/%{na
 install %{SOURCE2} $RPM_BUILD_ROOT/etc/rc.d/init.d/%{name}
 install %{SOURCE3} $RPM_BUILD_ROOT/etc/sysconfig/%{name}
 install %{SOURCE4} $RPM_BUILD_ROOT/etc/init/%{name}.conf
+install %{SOURCE5} $RPM_BUILD_ROOT%{systemdunitdir}/cherokee.service
 
 # users don't need this
 mv $RPM_BUILD_ROOT{%{_bindir},%{_sbindir}}/cherokee-panic
@@ -218,12 +223,14 @@ if [ "$1" = "2" -a -e %{_sysconfdir}/cherokee.conf ]; then
 fi
 /sbin/chkconfig --add %{name}
 %service %{name} restart "Cherokee webserver"
+%systemd_post %{name}.service
 
 %preun
 if [ "$1" = "0" ]; then
 	%service %{name} stop
 	/sbin/chkconfig --del %{name}
 fi
+%systemd_preun %{name}.service
 
 %postun
 if [ "$1" = "0" ]; then
@@ -231,6 +238,10 @@ if [ "$1" = "0" ]; then
 	%groupremove cherokee
 	%groupremove http
 fi
+%systemd_reload
+
+%triggerpostun -- %{name} < 1.2.103-1
+%systemd_trigger %{name}.service
 
 %post upstart
 %upstart_post %{name}
@@ -250,6 +261,7 @@ fi
 %config(noreplace) %verify(not md5 mtime size) /etc/pam.d/cherokee
 %config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/cherokee
 %attr(754,root,root) /etc/rc.d/init.d/cherokee
+%{systemdunitdir}/%{name}.service
 
 %attr(755,root,root) %{_bindir}/CTK-run
 %attr(755,root,root) %{_bindir}/cget

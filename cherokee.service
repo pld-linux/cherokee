@@ -1,0 +1,11 @@
+[Unit]
+Description=Cherokee web server
+After=network.target syslog.target
+
+[Service]
+Type=forking
+ExecStart=/usr/sbin/cherokee -d
+PIDFile=/var/run/cherokee.pid
+
+[Install]
+WantedBy=multi-user.target
