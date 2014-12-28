@@ -34,7 +34,7 @@ URL:		http://www.cherokee-project.com/
 BuildRequires:	autoconf
 BuildRequires:	automake
 %{?with_ffmpeg:BuildRequires:	ffmpeg-devel >= 1.0}
-BuildRequires:	gettext-devel
+BuildRequires:	gettext-tools
 BuildRequires:	libtool
 %{?with_mysql:BuildRequires:	mysql-devel}
 %{?with_ldap:BuildRequires:	openldap-devel}
