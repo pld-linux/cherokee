@@ -79,13 +79,11 @@ start() {
 		return
 	fi
 
-	emit starting JOB=cherokee SERVICE=web-server
 	msg_starting "Cherokee Web Server"
 	daemon cherokee -d
 	RETVAL=$?
 	if [ $RETVAL -eq 0 ]; then
 		touch /var/lock/subsys/cherokee
-		emit --no-wait started JOB=cherokee SERVICE=web-server
 	fi
 }
 
@@ -96,12 +94,10 @@ stop() {
 	fi
 
 	# Stop daemons.
-	emit stopping JOB=cherokee SERVICE=web-server
 	msg_stopping "Cherokee Web Server"
 	killproc cherokee
 	RETVAL=$?
 	rm -f /var/lock/subsys/cherokee >/dev/null 2>&1
-	emit --no-wait stopped JOB=cherokee SERVICE=web-server
 }
 
 condrestart() {
@@ -137,8 +133,6 @@ reload() {
 		RETVAL=1
 	fi
 }
-
-upstart_controlled --except configtest
 
 RETVAL=0
 # See how we were called.

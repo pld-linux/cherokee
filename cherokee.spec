@@ -14,7 +14,7 @@ Summary:	Fast, Flexible and Lightweight Web server
 Summary(pl.UTF-8):	Cherokee - serwer WWW
 Name:		cherokee
 Version:	1.2.103
-Release:	3
+Release:	4
 License:	GPL v2
 Group:		Networking/Daemons
 Source0:	https://github.com/cherokee/webserver/archive/v%{version}.zip
@@ -24,8 +24,7 @@ Source1:	CTK-20120806.tar.xz
 # Source1-md5:	567f087cd6cdf10b89047535cbe94f8e
 Source2:	%{name}.init
 Source3:	%{name}.sysconfig
-Source4:	%{name}.upstart
-Source5:	%{name}.service
+Source4:	%{name}.service
 Patch0:		%{name}-config.patch
 Patch1:		%{name}-panic_path.patch
 Patch2:		ffmpeg0.11.patch
@@ -86,19 +85,6 @@ Obsługuje konfigurację w locie poprzez odczyt plików lub łańcuchów
 znaków, TLS/SSL poprzez OpenSSL, hosty wirtualne, uwierzytelnianie,
 opcje związane z pamięcią podręczną, PHP, własne zarządzanie błędami i
 wiele więcej.
-
-%package upstart
-Summary:	Upstart job description for the Cherokee web server
-Summary(pl.UTF-8):	Opis zadania Upstart dla serwera Cherokee
-Group:		Daemons
-Requires:	%{name} = %{version}-%{release}
-Requires:	upstart >= 0.6
-
-%description upstart
-Upstart job description for the Cherokee web server.
-
-%description upstart -l pl.UTF-8
-Opis zadania Upstart dla serwera WWW Cherokee.
 
 %package admin
 Summary:	Cherokee web server administration interface
@@ -171,7 +157,7 @@ touch po/admin/*.po
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT/etc/{init,pam.d,sysconfig,rc.d/init.d} \
+install -d $RPM_BUILD_ROOT/etc/{pam.d,sysconfig,rc.d/init.d} \
 		$RPM_BUILD_ROOT/var/log/%{name} \
 		$RPM_BUILD_ROOT%{systemdunitdir}
 
@@ -180,8 +166,7 @@ install -d $RPM_BUILD_ROOT/etc/{init,pam.d,sysconfig,rc.d/init.d} \
 
 install %{SOURCE2} $RPM_BUILD_ROOT/etc/rc.d/init.d/%{name}
 install %{SOURCE3} $RPM_BUILD_ROOT/etc/sysconfig/%{name}
-install %{SOURCE4} $RPM_BUILD_ROOT/etc/init/%{name}.conf
-install %{SOURCE5} $RPM_BUILD_ROOT%{systemdunitdir}/cherokee.service
+install %{SOURCE4} $RPM_BUILD_ROOT%{systemdunitdir}/cherokee.service
 
 # users don't need this
 mv $RPM_BUILD_ROOT{%{_bindir},%{_sbindir}}/cherokee-panic
@@ -242,12 +227,6 @@ fi
 
 %triggerpostun -- %{name} < 1.2.103-1
 %systemd_trigger %{name}.service
-
-%post upstart
-%upstart_post %{name}
-
-%postun upstart
-%upstart_postun %{name}
 
 %post	libs -p /sbin/ldconfig
 %postun	libs -p /sbin/ldconfig
@@ -353,10 +332,6 @@ fi
 %dir %attr(771,root,cherokee) /var/lib/%{name}
 %dir %attr(771,cherokee,cherokee) /var/lib/%{name}/graphs
 %dir %attr(771,cherokee,cherokee) /var/lib/%{name}/graphs/images
-
-%files upstart
-%defattr(644,root,root,755)
-%config(noreplace) %verify(not md5 mtime size) /etc/init/%{name}.conf
 
 %files admin -f %{name}.lang
 %defattr(644,root,root,755)
