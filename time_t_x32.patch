@@ -1,0 +1,11 @@
+--- webserver-1.2.103/cherokee/common-internal.h.time	2015-04-23 11:22:07.000000000 +0000
++++ webserver-1.2.103/cherokee/common-internal.h	2015-04-23 11:24:56.000000000 +0000
+@@ -239,6 +239,8 @@ char *strcasestr(char *s, char *find);
+ #  define TIME_MAX ((time_t)INT_MAX)
+ # elif (SIZEOF_TIME_T == SIZEOF_LONG)
+ #  define TIME_MAX ((time_t)LONG_MAX)
++# elif (SIZEOF_TIME_T == SIZEOF_UNSIGNED_LONG_LONG) /* x32 */
++#  define TIME_MAX ((time_t)0x7fffffffffffffffL)
+ # else
+ #  error "Can't define TIME_MAX"
+ # endif

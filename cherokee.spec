@@ -28,6 +28,7 @@ Source4:	%{name}.service
 Patch0:		%{name}-config.patch
 Patch1:		%{name}-panic_path.patch
 Patch2:		ffmpeg0.11.patch
+Patch3:		time_t_x32.patch
 URL:		http://www.cherokee-project.com/
 %{?with_geoip:BuildRequires:	GeoIP-devel}
 BuildRequires:	autoconf
@@ -128,6 +129,7 @@ Biblioteki serwera WWW Cherokee.
 %patch0 -p1
 %patch1 -p1
 #%patch2 -p1
+%patch3 -p1
 
 %build
 %{__libtoolize}
