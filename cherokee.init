@@ -6,7 +6,6 @@
 #
 # description:	Cherokee is Fast, Flexible and Lightweight Web server
 #
-# $Id$
 
 # Source function library
 . /etc/rc.d/init.d/functions
@@ -43,7 +42,7 @@ configtest() {
 
 # wrapper for configtest
 # with $details = 1 will report ok/fail status to output (status action)
-# with $detauls = 0 will silently discard ok output, and with fail exit script with failure
+# with $details = 0 will silently discard ok output, and with fail exit script with failure
 checkconfig() {
 	local details=${1:-0}
 
