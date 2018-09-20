@@ -13,12 +13,12 @@
 Summary:	Fast, Flexible and Lightweight Web server
 Summary(pl.UTF-8):	Cherokee - serwer WWW
 Name:		cherokee
-Version:	1.2.103
-Release:	9
+Version:	1.2.104
+Release:	1
 License:	GPL v2
 Group:		Networking/Daemons
 Source0:	https://github.com/cherokee/webserver/archive/v%{version}.zip
-# Source0-md5:	9e6d8e0dd95808d365d32ecb0a9b80fe
+# Source0-md5:	1f4fe0f0317c07b93c9cbbf4f843e724
 # the last snapshot from https://github.com/cherokee/CTK
 Source1:	CTK-20120806.tar.xz
 # Source1-md5:	567f087cd6cdf10b89047535cbe94f8e
@@ -29,6 +29,7 @@ Patch0:		%{name}-config.patch
 Patch1:		%{name}-panic_path.patch
 Patch2:		ffmpeg0.11.patch
 Patch3:		time_t_x32.patch
+Patch4:		openssl.patch
 URL:		http://www.cherokee-project.com/
 %{?with_geoip:BuildRequires:	GeoIP-devel}
 BuildRequires:	autoconf
@@ -130,6 +131,7 @@ Biblioteki serwera WWW Cherokee.
 %patch1 -p1
 #%patch2 -p1
 %patch3 -p1
+%patch4 -p1
 
 %build
 %{__libtoolize}
@@ -191,7 +193,6 @@ rm $RPM_BUILD_ROOT/etc/cherokee/cherokee.conf.perf_sample
 rm $RPM_BUILD_ROOT%{_bindir}/cherokee-macos-askpass
 
 mv $RPM_BUILD_ROOT%{_localedir}/{sv_SE,sv}
-mv $RPM_BUILD_ROOT%{_localedir}/{jp,ja}
 %find_lang %{name}
 
 
