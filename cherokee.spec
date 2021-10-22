@@ -14,7 +14,7 @@ Summary:	Fast, Flexible and Lightweight Web server
 Summary(pl.UTF-8):	Cherokee - serwer WWW
 Name:		cherokee
 Version:	1.2.104
-Release:	1
+Release:	2
 License:	GPL v2
 Group:		Networking/Daemons
 Source0:	https://github.com/cherokee/webserver/archive/v%{version}.zip
@@ -132,6 +132,13 @@ Biblioteki serwera WWW Cherokee.
 #%patch2 -p1
 %patch3 -p1
 %patch4 -p1
+
+%{__sed} -E -i -e '1s,#!\s*/usr/bin/env\s+python2(\s|$),#!%{__python}\1,' -e '1s,#!\s*/usr/bin/env\s+python(\s|$),#!%{__python}\1,' \
+      admin/CTK/CTK-run.pre \
+      admin/server.py \
+      admin/upgrade_config.py \
+      cherokee/cherokee-admin-launcher \
+      cherokee/cherokee-tweak
 
 %build
 %{__libtoolize}
