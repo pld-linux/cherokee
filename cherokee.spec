@@ -14,7 +14,7 @@ Summary:	Fast, Flexible and Lightweight Web server
 Summary(pl.UTF-8):	Cherokee - serwer WWW
 Name:		cherokee
 Version:	1.2.104
-Release:	3
+Release:	4
 License:	GPL v2
 Group:		Networking/Daemons
 Source0:	https://github.com/cherokee/webserver/archive/v%{version}.zip
@@ -30,6 +30,7 @@ Patch1:		%{name}-panic_path.patch
 Patch2:		ffmpeg0.11.patch
 Patch3:		time_t_x32.patch
 Patch4:		openssl.patch
+Patch5:         build.patch
 URL:		http://www.cherokee-project.com/
 %{?with_geoip:BuildRequires:	GeoIP-devel}
 BuildRequires:	autoconf
@@ -132,6 +133,7 @@ Biblioteki serwera WWW Cherokee.
 #%patch2 -p1
 %patch3 -p1
 %patch4 -p1
+%patch5 -p1
 
 %{__sed} -E -i -e '1s,#!\s*/usr/bin/env\s+python2(\s|$),#!%{__python}\1,' -e '1s,#!\s*/usr/bin/env\s+python(\s|$),#!%{__python}\1,' \
       admin/CTK/CTK-run.pre \
