@@ -130,7 +130,7 @@ Biblioteki serwera WWW Cherokee.
 %setup -qn webserver-%{version} -a1
 %patch -P0 -p1
 %patch -P1 -p1
-#%patch2 -p1
+#%%patch2 -p1
 %patch -P3 -p1
 %patch -P4 -p1
 %patch -P5 -p1
